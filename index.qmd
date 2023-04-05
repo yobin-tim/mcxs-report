@@ -8,43 +8,152 @@ execute:
 bibliography: references.bib
 ---
 
-> **Abstract.**  
+> **Abstract.**  <under construction!> 
 >
-> **Keywords.** bsvars, impulse responses, quarto, R, housing price index, monetary policy
+> **Keywords.** bsvars, impulse responses, quarto, R, housing price index, monetary policy shocks
 
 
 # Introduction
-Monetary policy is one of the key instruments used by central banks to influence the overall performance of an economy. In recent years, the housing market has become an increasingly important channel through which monetary policy affects the broader economy in Australia as much of individual savings are tied up in housing wealth. As such, understanding the relationship between monetary policy and the housing market is crucial for policymakers, investors, and households alike.
+Monetary policy is one of the key instruments used by central banks to influence the overall economic activity. In recent years, the housing market has become an increasingly important channel through which monetary policy affects the broader economy (@AK_2017), particularly in Australia where around 57% of household wealth is tied up in the housing market (@Sweeney_2023). That number is thrice as big as the size of the super market in Australia and as such, understanding the relationship between monetary policy shocks and the housing market is crucial for policymakers, investors, and households alike.
 
-In this study, we aim to estimate the impact of monetary policy shocks on various housing indicators using a Structural Vector Autoregression (SVAR) approach. SVAR models are a popular econometric tool for investigating the dynamic interactions between macroeconomic variables. By applying this approach, we seek to shed light on how changes in monetary policy impact different dimensions of the housing market.
+In this study, we aim to estimate the impact of monetary policy shocks on various housing indicators using a Structural Vector Autoregression (SVAR) modeling approach. SVAR models are a popular econometric tool for investigating the dynamic interactions between macroeconomic variables. By applying this approach, we seek to shed light on how changes in monetary policy impact different dimensions of the housing market.
 
 # Research Question
-
+The objective of this paper is to estimate and quantify the impact of monetary policy shocks on different indicators of the housing market such as housing prices, housing transactions/sales, and the total number of housing units within an economy. Understanding these effects is crucial in understanding how money affects a key factor of the real side of the economy. An extension to this paper could be determining whether monetary policy shocks create a tradeoff between controlling housing prices and controlling economic activity.
 
 # Data and their Properties
 ## Empirical Project Setup
 This project website is being developed as a **Quarto** document and the empirical work in conducted using `R`. The necessary datasets are imported from the Reserve Bank of Australia (RBA) and the Australian Bureau of Statistics (ABS) websites using `readrba` and `readabs` respectively.
 
 ```{r load packages, include=FALSE}
-pkgs <- c('ggplot2', 'tidyr', 'dplyr', 'lubridate', 'readrba', 'readabs', 'tidyverse')
+pkgs <- c('ggplot2', 'tidyr', 'dplyr', 'lubridate', 'readrba', 'readabs', 'tidyverse', "xts", "plotly")
 # install.packages(pkgs)
 lapply(pkgs, library, character.only=TRUE)
 ```
 
-The following is the data on **M1** money supply in the RBA website. 
 
-```{r read m1 money supply, include=T}
-m1 <-read_rba_seriesid("DMAM1N")
-m1 %>%
-  ggplot(aes(x = date, y = value)) +
-  geom_line() +
-  theme_minimal() +
-  labs(title = "M1 (actual)")
+## Choice of variables
+I use the following variables to answer this question. I discuss the relevance of each variable.
+
+- $ \log(M1)  $: represents the log of the money supply M1. Both conventional and unconventional monetary policy shocks can change the stock of money supply and its size affects real variables of the economy.
+
+- $ \Delta CPI  $: represents the year-on-year change in the Consumer Price Index (CPI). It is a measure of inflation in an economy and is affected by monetary policy shocks.
+
+- $ \log(c)  $: represents the log of consumption of the economy. Monetary policy shocks can alter people's consumption-savings behavior.
+
+- $ \log(GDP) $: represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the efffect on the non-consumption aspect of the economy.
+
+- $ loanrate $: represents the weighted average interest rates on owner-occupied home loans. 
+
+- $ AUCR $: represents the Australian Cash Rate Target. This is the major monetary policy instrument available to the RBA.
+
+- $ USFFR $: represents the Federal Funds Rate Maximum Target Rate. Monetary policy adopted in the US tend to ripple into other economies so this is a variable of interest. Another extension to this variable would be to include the Target rates of Australia's largest trading partners.
+
+- $ nhouses $: represents the number of new private dwellings (houses) approved for construction in Australia. Impact on housing prices might be dampened by the supply elasticity of housing captured by this variable.
+
+- $ PPI $: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012.
+
+
+```{r download relevant variables, include=FALSE}
+
+# M1 Money Supply; quarterly; billions; log
+m1.raw <- read_rba_seriesid("DMAM1N")
+m1.qtr <- to.quarterly(xts(m1.raw$value, m1.raw$date), OHLC = F)
+m1.qtr[,] <- log(m1.qtr[,])
+
+# Change in CPI; quarterly; pct change yoy
+# Use cpi.raw <- read_rba_seriesid("GCPIAG") to get actual index value.
+cpi.raw <- read_rba_seriesid("GCPIAGYP")
+cpi.qtr <- to.quarterly(xts(cpi.raw$value, cpi.raw$date), OHLC = F)
+
+# Consumption share of GDP; quarterly; millions -> billions; log
+consumption.raw <- read_rba_seriesid("GGDPECCVPSH")
+consumption.qtr <- to.quarterly(xts(consumption.raw$value, consumption.raw$date), OHLC = F)
+consumption.qtr[,] <- log(consumption.qtr[,]/1000)
+
+# Nominal GDP; quarterly; millions -> billions; log
+gdp.raw <- read_rba_seriesid("GGDPECCPGDP")
+gdp.qtr <- to.quarterly(xts(gdp.raw$value, gdp.raw$date), OHLC = F)
+gdp.qtr[,] <- log(gdp.qtr[,]/1000)
+
+# Owner-occupied variable home loan rates; monthly; 
+homeloan.raw <- read_rba_seriesid("FILRHLBVS")
+homeloan.qtr <- to.quarterly(xts(homeloan.raw$value, homeloan.raw$date), OHLC = F)
+
+
+# AUS CR Target Rate; monthly; starts from 1990
+cashrate.raw <- read_rba_seriesid("FOOIRATCR")
+cashrate.qtr <- to.quarterly(xts(cashrate.raw$value, cashrate.raw$date), OHLC = F)
+
+# US FFR Max Target Rate; monthly -> quarterly,
+usffr.raw <- read_rba_seriesid("FOOIRUSFFTRMX")
+usffr.qtr <- to.quarterly(xts(usffr.raw$value, usffr.raw$date), OHLC = F)
+
+# real money balances
+
+
+# quantity of dwelling units, houses; monthly; jul 1983
+nhomes.raw <- read_abs_series("A418433F")
+nhomes.qtr <- to.quarterly(xts(nhomes.raw$value, nhomes.raw$date), OHLC = F)
+nhomes.qtr[,] <- log(nhomes.qtr[,]/1000)
+
+# Residential property price index; quarterly; sep 2003
+homeprice.raw <- read_abs_series("A83728455L")
+homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC = F)
 ```
 
+
+## Data Properties
+The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their absolute values, while variables expressed in percentage change terms do not exhibit this behavior.
+```{r visualize the data, include=TRUE, fig.width=11, fig.height=8}
+ # m1.qtr %>%
+ #  ggplot(data=data.frame(date=index(m1.qtr)), value = coredata(m1.qtr$value)+
+ #  aes(x = date, y = value)) +
+ #  ggtitle("M1 Money Supply")+
+ #  geom_line() +
+ #  theme_minimal() +
+ #  labs(x = "Year", y = "AU$, billions")+
+ #  theme_bw()
+
+par(mfrow = c(3,3))
+plot(m1.qtr, main = "M1 Money Supply (logs)", xlab = "Date", ylab = "AU$, billions", main.timespan = F)
+plot(cashrate.qtr, main = "RBA Target Cash Rate", xlab = "Date", ylab = "%", main.timespan = F)
+plot(usffr.qtr, main = "US FFR Max Target Rate", xlab = "Date", ylab = "%", main.timespan = F)
+plot(cpi.qtr, main = "% Change in CPI, yoy", xlab = "Date", ylab = "%", main.timespan = F)
+plot(consumption.qtr, main = "Aggregate Consumption (log)", xlab = "Date", ylab = "AU$, billions", main.timespan = F)
+plot(gdp.qtr, main = "Nominal GDP (log)", xlab = "Date", ylab = "AU$, billions", main.timespan = F)
+plot(homeloan.qtr, main = "Owner-occupied home loan rates", xlab = "Date", ylab = "%", main.timespan = F)
+plot(nhomes.qtr, main = "Quantity of homes", xlab = "Date", main.timespan = F)
+plot(homeprice.qtr, main = "House Price Index", xlab = "Date", main.timespan = F)
+
+
+```
+
+
+
 # Model and Hypothesis
+I employ a strutural VAR model to assess the impact of monetary policy shocks on different housing indicators. The sVAR model with $p$ lags can be written as
+$$
+\begin{align}
+&B_0Y_t = B_0 + B_1 Y_{t-1} + \dots + B_p Y_{t-p} + U_t\\
+&U_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, I_N)
+\end{align}
+$$ 
+where $Y_t = [\log(M1), \Delta CPI, \log(c), \log(GDP), loanrate, AUCR, USFFR, nhouses, PPI]'$.
+
+$B_0$ is a **structural matrix ** that captures the contemporaneous relationship between the variables in $Y_t$. $U_t$ represents conditionally independent **structural shocks**.
+
+The structural model can be estimated utilizing the information from its corresponding RF model
+$$
+\begin{align}
+&Y_t = A_0 + A_1 Y_{t-1} + \dots + A_p Y_{t-p} + E_t\\
+&E_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, \Sigma)
+\end{align}
+$$ 
+where $ A_i = B_0^{-1}B_i $ and $B_0^{-1}I_N  (B_0^{-1})'$.
 
 
+The identification in the sVAR model can be achieved either by using some exclusion restrictions, sign restrictions, instrumental variables, or prior distribution. The next section will talk about the exact composition of the structural matrix and the conditions for identification. 
 
 
 ## References {.unnumbered}
