@@ -35,23 +35,23 @@ lapply(pkgs, library, character.only=TRUE)
 ## Choice of variables
 I use the following variables to answer this question. I discuss the relevance of each variable.
 
-- $ \log(M1)  $: represents the log of the money supply M1. Both conventional and unconventional monetary policy shocks can change the stock of money supply and its size affects real variables of the economy.
+- $\log(M1)$: represents the log of the money supply M1. Both conventional and unconventional monetary policy shocks can change the stock of money supply and its size affects real variables of the economy.
 
-- $ \Delta CPI  $: represents the year-on-year change in the Consumer Price Index (CPI). It is a measure of inflation in an economy and is affected by monetary policy shocks.
+- $\Delta CPI$: represents the year-on-year change in the Consumer Price Index (CPI). It is a measure of inflation in an economy and is affected by monetary policy shocks.
 
-- $ \log(c)  $: represents the log of consumption of the economy. Monetary policy shocks can alter people's consumption-savings behavior.
+- $\log(c)$: represents the log of consumption of the economy. Monetary policy shocks can alter people's consumption-savings behavior.
 
-- $ \log(GDP) $: represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the efffect on the non-consumption aspect of the economy.
+- $\log(GDP)$: represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the efffect on the non-consumption aspect of the economy.
 
-- $ loanrate $: represents the weighted average interest rates on owner-occupied home loans. 
+- $loanrate$: represents the weighted average interest rates on owner-occupied home loans. 
 
-- $ AUCR $: represents the Australian Cash Rate Target. This is the major monetary policy instrument available to the RBA.
+- $AUCR$: represents the Australian Cash Rate Target. This is the major monetary policy instrument available to the RBA.
 
-- $ USFFR $: represents the Federal Funds Rate Maximum Target Rate. Monetary policy adopted in the US tend to ripple into other economies so this is a variable of interest. Another extension to this variable would be to include the Target rates of Australia's largest trading partners.
+- $USFFR$: represents the Federal Funds Rate Maximum Target Rate. Monetary policy adopted in the US tend to ripple into other economies so this is a variable of interest. Another extension to this variable would be to include the Target rates of Australia's largest trading partners.
 
-- $ nhouses $: represents the number of new private dwellings (houses) approved for construction in Australia. Impact on housing prices might be dampened by the supply elasticity of housing captured by this variable.
+- $nhouses$: represents the number of new private dwellings (houses) approved for construction in Australia. Impact on housing prices might be dampened by the supply elasticity of housing captured by this variable.
 
-- $ PPI $: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012.
+- $PPI$: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012.
 
 
 ```{r download relevant variables, include=FALSE}
