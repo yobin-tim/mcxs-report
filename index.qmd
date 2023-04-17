@@ -116,7 +116,7 @@ The variables discussed above are illustrated in the figure below. Note that the
  #  theme_bw()
 
 par(mfrow = c(3,3))
-plot(m1.qtr, main = "M1 Money Supply (logs)", xlab = "Date", ylab = "AU$, billions", main.timespan = F)
+plot(m1.qtr, main = "M1 Money Supply (logs)", xlab = "Date", ylab = "AU$, log billions", main.timespan = F)
 plot(cashrate.qtr, main = "RBA Target Cash Rate", xlab = "Date", ylab = "%", main.timespan = F)
 plot(usffr.qtr, main = "US FFR Max Target Rate", xlab = "Date", ylab = "%", main.timespan = F)
 plot(cpi.qtr, main = "% Change in CPI, yoy", xlab = "Date", ylab = "%", main.timespan = F)
