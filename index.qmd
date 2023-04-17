@@ -1,5 +1,5 @@
 ---
-title: "Estimating the impact of monetary policy shocks on different housing indicators: An SVar Approach"
+title: "Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach"
 author: "Yobin Timilsena"
 
 execute:
