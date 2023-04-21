@@ -104,7 +104,7 @@ homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC
 
 
 ## Data Properties
-The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their absolute values, while variables expressed in percentage change terms do not exhibit this behavior.
+The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards (because they are expressed in their absolute values), while variables expressed in percentage change terms do not exhibit this behavior.
 ```{r visualize the data, include=TRUE, fig.width=11, fig.height=8}
  # m1.qtr %>%
  #  ggplot(data=data.frame(date=index(m1.qtr)), value = coredata(m1.qtr$value)+
@@ -129,6 +129,7 @@ plot(homeprice.qtr, main = "House Price Index", xlab = "Date", main.timespan = F
 
 ```
 
+The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q, including 74 observations. 
 
 
 # Model and Hypothesis
