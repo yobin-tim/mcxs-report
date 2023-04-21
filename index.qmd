@@ -129,7 +129,30 @@ plot(homeprice.qtr, main = "House Price Index", xlab = "Date", main.timespan = F
 
 ```
 
-The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q, including 74 observations. 
+The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q4, including 74 observations, plots of truncated dataset is shown as: 
+```{r : truncating data}
+df <- as.data.frame(na.omit(cbind(m1.qtr,cashrate.qtr,usffr.qtr)))
+df                             <- head(df,-1) # remove the last obs 
+colnames(df)                   <- c("m1","cashrate","usffr")
+df["cpi"]                      <- as.numeric(cpi.qtr[268:length(cpi.qtr)])                 
+df["consumption"]              <- as.numeric(tail(consumption.qtr,nrow(df)))
+df["gdp"]                      <- as.numeric(tail(gdp.qtr,nrow(df)))
+df["homeloan"]                 <- as.numeric(tail(homeloan.qtr,nrow(df)+1))[-133]
+df["nhomes"]                   <- as.numeric(tail(nhomes.qtr,nrow(df)+1))[-133]
+df                             <- head(df,-4) # drop the last 4 obs 
+df["homeprice"]                <- NA 
+df[55:128,"homeprice"]         <- as.numeric(homeprice.qtr)
+df                             <- na.omit(df)
+```
+
+```{r}
+names <- colnames(df)
+par(mfrow = c(3,3))
+for (j in 1:ncol(df)){
+  plot(df[,j],ylab = "", xlab = "",,type='l', main = paste(names [j]),lwd = 2.5)
+}
+
+```
 
 
 # Model and Hypothesis
