@@ -136,10 +136,10 @@ I employ a strutural VAR model to assess the impact of monetary policy shocks on
 $$
 \begin{align}
 &B_0Y_t = B_0 + B_1 Y_{t-1} + \dots + B_p Y_{t-p} + U_t\\
-&U_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, I_N)
+&U_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0_N, I_N)
 \end{align}
 $$ 
-where $Y_t = [\log(M1), \Delta CPI, \log(c), \log(GDP), loanrate, AUCR, USFFR, nhouses, PPI]'$.
+where $Y_t = [\log(M1_t), \Delta CPI_t, \log(c_t), \log(GDP_t), loanrate_t, AUCR_t, USFFR_t, nhouses_t, PPI_t]'$.
 
 $B_0$ is a **structural matrix ** that captures the contemporaneous relationship between the variables in $Y_t$. $U_t$ represents conditionally independent **structural shocks**.
 
@@ -147,10 +147,10 @@ The structural model can be estimated utilizing the information from its corresp
 $$
 \begin{align}
 &Y_t = A_0 + A_1 Y_{t-1} + \dots + A_p Y_{t-p} + E_t\\
-&E_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, \Sigma)
+&E_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0_N, \Sigma)
 \end{align}
 $$ 
-where $ A_i = B_0^{-1}B_i $ and $B_0^{-1}I_N  (B_0^{-1})'$.
+where $A_i = B_0^{-1}B_i$ and $B_0^{-1}I_N  (B_0^{-1})'$.
 
 
 The identification in the sVAR model can be achieved either by using some exclusion restrictions, sign restrictions, instrumental variables, or prior distribution. The next section will talk about the exact composition of the structural matrix and the conditions for identification. 
