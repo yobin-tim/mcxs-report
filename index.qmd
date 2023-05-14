@@ -130,6 +130,15 @@ plot(homeprice.qtr, main = "House Price Index", xlab = "Date", main.timespan = F
 ```
 
 
+```{r integratio order}
+
+adf = tseries::adf.test(m1.qtr, k = 4)
+diff_adf = tseries::adf.test(diff(m1.qtr), k = 3)
+FinTS::Acf(m1.qtr)
+# please use the outputs to create a table reporting test statistic, p-value, the variable (and transformation), lag order. Write a conclusion regarding the integration order.
+```
+
+
 
 # Model and Hypothesis
 I employ a strutural VAR model to assess the impact of monetary policy shocks on different housing indicators. The sVAR model with $p$ lags can be written as
