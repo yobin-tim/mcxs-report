@@ -104,7 +104,8 @@ homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC
 
 
 ## Data Properties
-The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards (because they are expressed in their absolute values), while variables expressed in percentage change terms do not exhibit this behavior.
+The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behavior.
+
 ```{r visualize the data, include=TRUE, fig.width=11, fig.height=8}
  # m1.qtr %>%
  #  ggplot(data=data.frame(date=index(m1.qtr)), value = coredata(m1.qtr$value)+
@@ -153,6 +154,15 @@ for (j in 1:ncol(df)){
 }
 
 ```
+
+```{r integratio order}
+
+adf = tseries::adf.test(m1.qtr, k = 4)
+diff_adf = tseries::adf.test(diff(m1.qtr), k = 3)
+FinTS::Acf(m1.qtr)
+# please use the outputs to create a table reporting test statistic, p-value, the variable (and transformation), lag order. Write a conclusion regarding the integration order.
+```
+
 
 
 # Model and Hypothesis
