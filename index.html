@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<head>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta charset="utf-8" />
+<meta name="generator" content="quarto-1.2.335" />
 
-<meta name="author" content="Yobin Timilsena">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 
-<title>Macroeconometrics Research Report - Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach</title>
+<meta name="author" content="Yobin Timilsena" />
+
+<title>Macroeconometrics Research Report – Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -42,23 +44,7 @@ div.csl-indent {
 }
 </style>
 
-
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<!-- htmldependencies:E3FAD763 -->
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -81,17 +67,17 @@ div.csl-indent {
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css" />
 </head>
 
-<body class="nav-fixed">
+<body>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="/index.html">
     <span class="navbar-title">Macroeconometrics Research Report</span>
     </a>
   </div>
@@ -104,24 +90,7 @@ div.csl-indent {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#research-question" id="toc-research-question" class="nav-link" data-scroll-target="#research-question">Research Question</a></li>
-  <li><a href="#data-and-their-properties" id="toc-data-and-their-properties" class="nav-link" data-scroll-target="#data-and-their-properties">Data and their Properties</a>
-  <ul class="collapse">
-  <li><a href="#empirical-project-setup" id="toc-empirical-project-setup" class="nav-link" data-scroll-target="#empirical-project-setup">Empirical Project Setup</a></li>
-  <li><a href="#choice-of-variables" id="toc-choice-of-variables" class="nav-link" data-scroll-target="#choice-of-variables">Choice of variables</a></li>
-  <li><a href="#data-properties" id="toc-data-properties" class="nav-link" data-scroll-target="#data-properties">Data Properties</a></li>
-  </ul></li>
-  <li><a href="#model-and-hypothesis" id="toc-model-and-hypothesis" class="nav-link" data-scroll-target="#model-and-hypothesis">Model and Hypothesis</a>
-  <ul class="collapse">
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
-  </ul></li>
-  </ul>
-</nav>
+        <div id="quarto-toc-target"></div>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -148,8 +117,25 @@ div.csl-indent {
   
 
 </header>
-
-<blockquote class="blockquote">
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+  <li><a href="#research-question" id="toc-research-question">Research Question</a></li>
+  <li><a href="#data-and-their-properties" id="toc-data-and-their-properties">Data and their Properties</a>
+  <ul>
+  <li><a href="#empirical-project-setup" id="toc-empirical-project-setup">Empirical Project Setup</a></li>
+  <li><a href="#choice-of-variables" id="toc-choice-of-variables">Choice of variables</a></li>
+  <li><a href="#data-properties" id="toc-data-properties">Data Properties</a></li>
+  </ul></li>
+  <li><a href="#model-and-hypothesis" id="toc-model-and-hypothesis">Model and Hypothesis</a>
+  <ul>
+  <li><a href="#references" id="toc-references">References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+<blockquote>
 <p><strong>Abstract.</strong> &lt;under construction!&gt;</p>
 <p><strong>Keywords.</strong> bsvars, impulse responses, quarto, R, housing price index, monetary policy shocks</p>
 </blockquote>
@@ -165,11 +151,11 @@ div.csl-indent {
 <section id="data-and-their-properties" class="level1">
 <h1>Data and their Properties</h1>
 <section id="empirical-project-setup" class="level2">
-<h2 class="anchored" data-anchor-id="empirical-project-setup">Empirical Project Setup</h2>
+<h2>Empirical Project Setup</h2>
 <p>This project website is being developed as a <strong>Quarto</strong> document and the empirical work in conducted using <code>R</code>. The necessary datasets are imported from the Reserve Bank of Australia (RBA) and the Australian Bureau of Statistics (ABS) websites using <code>readrba</code> and <code>readabs</code> respectively.</p>
 </section>
 <section id="choice-of-variables" class="level2">
-<h2 class="anchored" data-anchor-id="choice-of-variables">Choice of variables</h2>
+<h2>Choice of variables</h2>
 <p>I use the following variables to answer this question. I discuss the relevance of each variable.</p>
 <ul>
 <li><p><span class="math inline">\(\log(M1)\)</span>: represents the log of the money supply M1. Both conventional and unconventional monetary policy shocks can change the stock of money supply and its size affects real variables of the economy.</p></li>
@@ -184,11 +170,11 @@ div.csl-indent {
 </ul>
 </section>
 <section id="data-properties" class="level2">
-<h2 class="anchored" data-anchor-id="data-properties">Data Properties</h2>
+<h2>Data Properties</h2>
 <p>The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their absolute values, while variables expressed in percentage change terms do not exhibit this behavior.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/visualize the data-1.png" class="img-fluid" width="1056"></p>
+<p><img src="index_files/figure-html/visualize%20the%20data-1.png" class="img-fluid" width="1056" /></p>
 </div>
 </div>
 </section>
@@ -200,32 +186,36 @@ div.csl-indent {
 &amp;B_0Y_t = B_0 + B_1 Y_{t-1} + \dots + B_p Y_{t-p} + U_t\\
 &amp;U_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, I_N)
 \end{align}
-\]</span> where <span class="math inline">\(Y_t = [\log(M1), \Delta CPI, \log(c), \log(GDP), loanrate, AUCR, USFFR, nhouses, PPI]'\)</span>.</p>
+\]</span> where <span class="math inline">\(Y_t = [\log(M1), \Delta CPI, \log(c), \log(GDP), loanrate, AUCR, USFFR, nhouses, PPI]&#39;\)</span>.</p>
 <p><span class="math inline">\(B_0\)</span> is a <strong>structural matrix </strong> that captures the contemporaneous relationship between the variables in <span class="math inline">\(Y_t\)</span>. <span class="math inline">\(U_t\)</span> represents conditionally independent <strong>structural shocks</strong>.</p>
 <p>The structural model can be estimated utilizing the information from its corresponding RF model <span class="math display">\[
 \begin{align}
 &amp;Y_t = A_0 + A_1 Y_{t-1} + \dots + A_p Y_{t-p} + E_t\\
 &amp;E_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, \Sigma)
 \end{align}
-\]</span> where $ A_i = B_0^{-1}B_i $ and <span class="math inline">\(B_0^{-1}I_N (B_0^{-1})'\)</span>.</p>
+\]</span> where $ A_i = B_0^{-1}B_i $ and <span class="math inline">\(B_0^{-1}I_N (B_0^{-1})&#39;\)</span>.</p>
 <p>The identification in the sVAR model can be achieved either by using some exclusion restrictions, sign restrictions, instrumental variables, or prior distribution. The next section will talk about the exact composition of the structural matrix and the conditions for identification.</p>
 <section id="references" class="level2 unnumbered">
-
-
-
-
-</section>
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<h2 class="unnumbered">References</h2>
+<div id="quarto-navigation-envelope" class="hidden">
+<p><span class="hidden" data-render-id="quarto-int-sidebar-title">Macroeconometrics Research Report</span> <span class="hidden" data-render-id="quarto-int-navbar-title">Macroeconometrics Research Report</span></p>
+</div>
+<div id="quarto-meta-markdown" class="hidden">
+<p><span class="hidden" data-render-id="quarto-metatitle">Macroeconometrics Research Report - Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach</span> <span class="hidden" data-render-id="quarto-twittercardtitle">Macroeconometrics Research Report - Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach</span> <span class="hidden" data-render-id="quarto-ogcardtitle">Macroeconometrics Research Report - Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach</span> <span class="hidden" data-render-id="quarto-metasitename">Macroeconometrics Research Report</span></p>
+</div>
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-AK_2017" class="csl-entry" role="doc-biblioentry">
 Aliber, Robert Z., and Charles P. Kindleberger. 2017. <em>Manias, Panics, and Crashes: A History of Financial Crises, Seventh Edition</em>. Springer.
 </div>
 <div id="ref-Sweeney_2023" class="csl-entry" role="doc-biblioentry">
 Sweeney, Nila. 2023. <em>Australian Financial Review</em>, January. <a href="https://www.afr.com/property/residential/australia-s-9-3-trillion-housing-question-20230111-p5cbsu">https://www.afr.com/property/residential/australia-s-9-3-trillion-housing-question-20230111-p5cbsu</a>.
 </div>
-</div></section></div></main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id = "quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -360,6 +350,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 </div> <!-- /content -->
 
+</body>
 
-
-</body></html>
+</html>

@@ -2,28 +2,28 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVar Approach",
+    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach",
     "section": "",
     "text": "Abstract. <under construction!>\nKeywords. bsvars, impulse responses, quarto, R, housing price index, monetary policy shocks"
   },
   {
     "objectID": "index.html#empirical-project-setup",
     "href": "index.html#empirical-project-setup",
-    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVar Approach",
+    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach",
     "section": "Empirical Project Setup",
     "text": "Empirical Project Setup\nThis project website is being developed as a Quarto document and the empirical work in conducted using R. The necessary datasets are imported from the Reserve Bank of Australia (RBA) and the Australian Bureau of Statistics (ABS) websites using readrba and readabs respectively."
   },
   {
     "objectID": "index.html#choice-of-variables",
     "href": "index.html#choice-of-variables",
-    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVar Approach",
+    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach",
     "section": "Choice of variables",
-    "text": "Choice of variables\nI use the following variables to answer this question. I discuss the relevance of each variable.\n\n$ (M1) $: represents the log of the money supply M1. Both conventional and unconventional monetary policy shocks can change the stock of money supply and its size affects real variables of the economy.\n$ CPI $: represents the year-on-year change in the Consumer Price Index (CPI). It is a measure of inflation in an economy and is affected by monetary policy shocks.\n$ (c) $: represents the log of consumption of the economy. Monetary policy shocks can alter people’s consumption-savings behavior.\n$ (GDP) $: represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the efffect on the non-consumption aspect of the economy.\n$ loanrate $: represents the weighted average interest rates on owner-occupied home loans.\n$ AUCR $: represents the Australian Cash Rate Target. This is the major monetary policy instrument available to the RBA.\n$ USFFR $: represents the Federal Funds Rate Maximum Target Rate. Monetary policy adopted in the US tend to ripple into other economies so this is a variable of interest. Another extension to this variable would be to include the Target rates of Australia’s largest trading partners.\n$ nhouses $: represents the number of new private dwellings (houses) approved for construction in Australia. Impact on housing prices might be dampened by the supply elasticity of housing captured by this variable.\n$ PPI $: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012."
+    "text": "Choice of variables\nI use the following variables to answer this question. I discuss the relevance of each variable.\n\n\\(\\log(M1)\\): represents the log of the money supply M1. Both conventional and unconventional monetary policy shocks can change the stock of money supply and its size affects real variables of the economy.\n\\(\\Delta CPI\\): represents the year-on-year change in the Consumer Price Index (CPI). It is a measure of inflation in an economy and is affected by monetary policy shocks.\n\\(\\log(c)\\): represents the log of consumption of the economy. Monetary policy shocks can alter people’s consumption-savings behavior.\n\\(\\log(GDP)\\): represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the efffect on the non-consumption aspect of the economy.\n\\(loanrate\\): represents the weighted average interest rates on owner-occupied home loans.\n\\(AUCR\\): represents the Australian Cash Rate Target. This is the major monetary policy instrument available to the RBA.\n\\(USFFR\\): represents the Federal Funds Rate Maximum Target Rate. Monetary policy adopted in the US tend to ripple into other economies so this is a variable of interest. Another extension to this variable would be to include the Target rates of Australia’s largest trading partners.\n\\(nhouses\\): represents the number of new private dwellings (houses) approved for construction in Australia. Impact on housing prices might be dampened by the supply elasticity of housing captured by this variable.\n\\(PPI\\): represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012."
   },
   {
     "objectID": "index.html#data-properties",
     "href": "index.html#data-properties",
-    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVar Approach",
+    "title": "Estimating the impact of monetary policy shocks on different housing indicators: An SVAR Approach",
     "section": "Data Properties",
     "text": "Data Properties\nThe variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their absolute values, while variables expressed in percentage change terms do not exhibit this behavior."
   }

@@ -105,6 +105,7 @@ homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC
 
 ## Data Properties
 The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behavior.
+
 ```{r visualize the data, include=TRUE, fig.width=11, fig.height=8}
  # m1.qtr %>%
  #  ggplot(data=data.frame(date=index(m1.qtr)), value = coredata(m1.qtr$value)+
@@ -129,6 +130,30 @@ plot(homeprice.qtr, main = "House Price Index", xlab = "Date", main.timespan = F
 
 ```
 
+The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q4, including 74 observations, plots of truncated dataset is shown as: 
+```{r : truncating data}
+df <- as.data.frame(na.omit(cbind(m1.qtr,cashrate.qtr,usffr.qtr)))
+df                             <- head(df,-1) # remove the last obs 
+colnames(df)                   <- c("m1","cashrate","usffr")
+df["cpi"]                      <- as.numeric(cpi.qtr[268:length(cpi.qtr)])                 
+df["consumption"]              <- as.numeric(tail(consumption.qtr,nrow(df)))
+df["gdp"]                      <- as.numeric(tail(gdp.qtr,nrow(df)))
+df["homeloan"]                 <- as.numeric(tail(homeloan.qtr,nrow(df)+1))[-133]
+df["nhomes"]                   <- as.numeric(tail(nhomes.qtr,nrow(df)+1))[-133]
+df                             <- head(df,-4) # drop the last 4 obs 
+df["homeprice"]                <- NA 
+df[55:128,"homeprice"]         <- as.numeric(homeprice.qtr)
+df                             <- na.omit(df)
+```
+
+```{r}
+names <- colnames(df)
+par(mfrow = c(3,3))
+for (j in 1:ncol(df)){
+  plot(df[,j],ylab = "", xlab = "",,type='l', main = paste(names [j]),lwd = 2.5)
+}
+
+```
 
 ```{r integratio order}
 
@@ -145,10 +170,10 @@ I employ a strutural VAR model to assess the impact of monetary policy shocks on
 $$
 \begin{align}
 &B_0Y_t = B_0 + B_1 Y_{t-1} + \dots + B_p Y_{t-p} + U_t\\
-&U_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, I_N)
+&U_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0_N, I_N)
 \end{align}
 $$ 
-where $Y_t = [\log(M1), \Delta CPI, \log(c), \log(GDP), loanrate, AUCR, USFFR, nhouses, PPI]'$.
+where $Y_t = [\log(M1_t), \Delta CPI_t, \log(c_t), \log(GDP_t), loanrate_t, AUCR_t, USFFR_t, nhouses_t, PPI_t]'$.
 
 $B_0$ is a **structural matrix ** that captures the contemporaneous relationship between the variables in $Y_t$. $U_t$ represents conditionally independent **structural shocks**.
 
@@ -156,7 +181,7 @@ The structural model can be estimated utilizing the information from its corresp
 $$
 \begin{align}
 &Y_t = A_0 + A_1 Y_{t-1} + \dots + A_p Y_{t-p} + E_t\\
-&E_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0, \Sigma)
+&E_{t}| Y_{t-1} \dots Y_{t-p} \sim _{iid} ( 0_N, \Sigma)
 \end{align}
 $$ 
 where $A_i = B_0^{-1}B_i$ and $B_0^{-1}I_N  (B_0^{-1})'$.
