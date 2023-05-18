@@ -26,7 +26,7 @@ The objective of this paper is to estimate and quantify the impact of monetary p
 This project website is being developed as a **Quarto** document and the empirical work in conducted using `R`. The necessary datasets are imported from the Reserve Bank of Australia (RBA) and the Australian Bureau of Statistics (ABS) websites using `readrba` and `readabs` respectively.
 
 ```{r load packages, include=FALSE}
-pkgs <- c('ggplot2', 'tidyr', 'dplyr', 'lubridate', 'readrba', 'readabs', 'tidyverse', "xts", "plotly")
+pkgs <- c('ggplot2', 'tidyr', 'dplyr', 'lubridate', 'readrba', 'readabs', 'tidyverse', "xts", "plotly", "rmarkdown", "zoo", "quantmod")
 # install.packages(pkgs)
 lapply(pkgs, library, character.only=TRUE)
 ```
@@ -41,7 +41,7 @@ I use the following variables to answer this question. I discuss the relevance o
 
 - $\log(c)$: represents the log of consumption of the economy. Monetary policy shocks can alter people's consumption-savings behavior.
 
-- $\log(GDP)$: represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the efffect on the non-consumption aspect of the economy.
+- $\log(GDP)$: represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the effect on the non-consumption aspect of the economy.
 
 - $loanrate$: represents the weighted average interest rates on owner-occupied home loans. 
 
@@ -54,47 +54,47 @@ I use the following variables to answer this question. I discuss the relevance o
 - $PPI$: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012.
 
 
-```{r download relevant variables, include=FALSE}
+```{r download relevant variables, eval=FALSE}
 
 # M1 Money Supply; quarterly; billions; log
-m1.raw <- read_rba_seriesid("DMAM1N")
-m1.qtr <- to.quarterly(xts(m1.raw$value, m1.raw$date), OHLC = F)
-m1.qtr[,] <- log(m1.qtr[,])
+m1.raw        <- read_rba_seriesid("DMAM1N")
+m1.qtr        <- to.quarterly(xts(m1.raw$value, m1.raw$date), OHLC = F)
+m1.qtr[,]     <- log(m1.qtr[,])
 
 # Change in CPI; quarterly; pct change yoy
 # Use cpi.raw <- read_rba_seriesid("GCPIAG") to get actual index value.
-cpi.raw <- read_rba_seriesid("GCPIAGYP")
-cpi.qtr <- to.quarterly(xts(cpi.raw$value, cpi.raw$date), OHLC = F)
+cpi.raw       <- read_rba_seriesid("GCPIAGYP")
+cpi.qtr       <- to.quarterly(xts(cpi.raw$value, cpi.raw$date), OHLC = F)
 
 # Consumption share of GDP; quarterly; millions -> billions; log
-consumption.raw <- read_rba_seriesid("GGDPECCVPSH")
-consumption.qtr <- to.quarterly(xts(consumption.raw$value, consumption.raw$date), OHLC = F)
+consumption.raw    <- read_rba_seriesid("GGDPECCVPSH")
+consumption.qtr    <- to.quarterly(xts(consumption.raw$value, consumption.raw$date), OHLC = F)
 consumption.qtr[,] <- log(consumption.qtr[,]/1000)
 
 # Nominal GDP; quarterly; millions -> billions; log
-gdp.raw <- read_rba_seriesid("GGDPECCPGDP")
-gdp.qtr <- to.quarterly(xts(gdp.raw$value, gdp.raw$date), OHLC = F)
-gdp.qtr[,] <- log(gdp.qtr[,]/1000)
+gdp.raw       <- read_rba_seriesid("GGDPECCPGDP")
+gdp.qtr       <- to.quarterly(xts(gdp.raw$value, gdp.raw$date), OHLC = F)
+gdp.qtr[,]    <- log(gdp.qtr[,]/1000)
 
 # Owner-occupied variable home loan rates; monthly; 
-homeloan.raw <- read_rba_seriesid("FILRHLBVS")
-homeloan.qtr <- to.quarterly(xts(homeloan.raw$value, homeloan.raw$date), OHLC = F)
+homeloan.raw  <- read_rba_seriesid("FILRHLBVS")
+homeloan.qtr  <- to.quarterly(xts(homeloan.raw$value, homeloan.raw$date), OHLC = F)
 
 
 # AUS CR Target Rate; monthly; starts from 1990
-cashrate.raw <- read_rba_seriesid("FOOIRATCR")
-cashrate.qtr <- to.quarterly(xts(cashrate.raw$value, cashrate.raw$date), OHLC = F)
+cashrate.raw  <- read_rba_seriesid("FOOIRATCR")
+cashrate.qtr  <- to.quarterly(xts(cashrate.raw$value, cashrate.raw$date), OHLC = F)
 
 # US FFR Max Target Rate; monthly -> quarterly,
-usffr.raw <- read_rba_seriesid("FOOIRUSFFTRMX")
-usffr.qtr <- to.quarterly(xts(usffr.raw$value, usffr.raw$date), OHLC = F)
+usffr.raw     <- read_rba_seriesid("FOOIRUSFFTRMX")
+usffr.qtr     <- to.quarterly(xts(usffr.raw$value, usffr.raw$date), OHLC = F)
 
 # real money balances
 
 
 # quantity of dwelling units, houses; monthly; jul 1983
-nhomes.raw <- read_abs_series("A418433F")
-nhomes.qtr <- to.quarterly(xts(nhomes.raw$value, nhomes.raw$date), OHLC = F)
+nhomes.raw    <- read_abs_series("A418433F")
+nhomes.qtr    <- to.quarterly(xts(nhomes.raw$value, nhomes.raw$date), OHLC = F)
 nhomes.qtr[,] <- log(nhomes.qtr[,]/1000)
 
 # Residential property price index; quarterly; sep 2003
@@ -102,6 +102,11 @@ homeprice.raw <- read_abs_series("A83728455L")
 homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC = F)
 ```
 
+
+```{r : Step 0 - Load saved data, eval=TRUE, include=FALSE}
+  load(file = "ProjectData.RData") # load saved empirical data if needed
+
+```
 
 ## Data Properties
 The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behavior.
@@ -133,20 +138,20 @@ plot(homeprice.qtr, main = "House Price Index", xlab = "Date", main.timespan = F
 The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q4, including 74 observations, plots of truncated dataset is shown as: 
 ```{r : truncating data}
 df <- as.data.frame(na.omit(cbind(m1.qtr,cashrate.qtr,usffr.qtr)))
-df                             <- head(df,-1) # remove the last obs 
-colnames(df)                   <- c("m1","cashrate","usffr")
-df["cpi"]                      <- as.numeric(cpi.qtr[268:length(cpi.qtr)])                 
-df["consumption"]              <- as.numeric(tail(consumption.qtr,nrow(df)))
-df["gdp"]                      <- as.numeric(tail(gdp.qtr,nrow(df)))
-df["homeloan"]                 <- as.numeric(tail(homeloan.qtr,nrow(df)+1))[-133]
-df["nhomes"]                   <- as.numeric(tail(nhomes.qtr,nrow(df)+1))[-133]
-df                             <- head(df,-4) # drop the last 4 obs 
-df["homeprice"]                <- NA 
-df[55:128,"homeprice"]         <- as.numeric(homeprice.qtr)
-df                             <- na.omit(df)
+df                                      <- head(df,-1) # remove the last obs 
+colnames(df)                            <- c("M1 Money Supply (logs)","RBA Target Cash Rate","US FFR Max Target Rate")
+df["% Change in CPI, yoy"]              <- as.numeric(cpi.qtr[269:length(cpi.qtr)])                 
+df["Aggregate Consumption (log)"]       <- as.numeric(tail(consumption.qtr,nrow(df)))
+df["Nominal GDP (log)"]                 <- as.numeric(tail(gdp.qtr,nrow(df)))
+df["Owner-occupied home loan rates"]    <- as.numeric(tail(homeloan.qtr,nrow(df)+1))[-133]
+df["Quantity of homes"]                 <- as.numeric(tail(nhomes.qtr,nrow(df)+1))[-133]
+df                                      <- head(df,-4) # drop the last 4 obs 
+df["House Price Index"]                 <- NA 
+df[55:128,"House Price Index"]          <- as.numeric(homeprice.qtr)
+df                                      <- na.omit(df)
 ```
 
-```{r}
+```{r, include=FALSE}
 names <- colnames(df)
 par(mfrow = c(3,3))
 for (j in 1:ncol(df)){
@@ -155,18 +160,78 @@ for (j in 1:ncol(df)){
 
 ```
 
-```{r integratio order}
+ <!-- ```{r integration order} -->
 
-adf = tseries::adf.test(m1.qtr, k = 4)
-diff_adf = tseries::adf.test(diff(m1.qtr), k = 3)
-FinTS::Acf(m1.qtr)
-# please use the outputs to create a table reporting test statistic, p-value, the variable (and transformation), lag order. Write a conclusion regarding the integration order.
+ <!-- adf = tseries::adf.test(m1.qtr, k = 4) -->
+ <!-- diff_adf = tseries::adf.test(na.omit(diff(m1.qtr)), k = 3) -->
+ <!-- FinTS::Acf(m1.qtr) -->
+ <!-- # please use the outputs to create a table reporting test statistic, p-value, the variable (and transformation), lag order. Write a conclusion regarding the integration order. -->
+
+ <!-- ``` -->
+ 
+
+Next, I perform and display ADF test results on the variables. I report, for each variable, the difference level at which the ADF tests rejects the null that the series is non-stationary. 
+
+```{r : perform adf tests on the data, warning= FALSE, echo=TRUE}
+
+perform_adf_tests <- function(df) {
+  # Create an empty dataframe to store the results
+  results <- data.frame(Variable = character(), TestType = character(), 
+                        TestStatistic = numeric(), PValue = numeric(), 
+                        stringsAsFactors = FALSE)
+
+  # Iterate over each column in the dataframe
+  for (col in colnames(df)) {
+    # Remove NA values from the column
+    column_data <- na.omit(df[[col]])
+
+    # Perform ADF test for levels
+    adf_levels <- tseries::adf.test(na.omit(column_data), k = 4)
+
+    # Check if p-value is less than or equal to 0.05
+    if (adf_levels$p.value <= 0.05) {
+      results <- bind_rows(results,
+        data.frame(Variable = col, TestType = "Levels", 
+                   TestStatistic = adf_levels$statistic,
+                   PValue = adf_levels$p.value)
+      )
+    } else {
+      # Perform ADF test for first difference
+      adf_diff1 <- tseries::adf.test(na.omit(diff(column_data)), k = 4)
+      
+      # Check if p-value is less than 0.05
+      if (adf_diff1$p.value < 0.05) {
+        results <- bind_rows(results,
+          data.frame(Variable = col, TestType = "First Difference", 
+                     TestStatistic = adf_diff1$statistic,
+                     PValue = adf_diff1$p.value)
+        )
+      } else {
+        # Perform ADF test for second difference
+        adf_diff2 <- tseries::adf.test(na.omit(diff(column_data, differences = 2)), k = 4)
+        
+        results <- bind_rows(results,
+            data.frame(Variable = col, TestType = "Second Difference", 
+                       TestStatistic = adf_diff2$statistic,
+                       PValue = adf_diff2$p.value)
+          )
+      }
+    }
+  }
+
+
+  # Return the results dataframe
+  return(results)
+}
+
+adf_test_results <- perform_adf_tests(df)
+rmarkdown::paged_table(adf_test_results)
+
 ```
 
 
-
 # Model and Hypothesis
-I employ a strutural VAR model to assess the impact of monetary policy shocks on different housing indicators. The sVAR model with $p$ lags can be written as
+I employ a strutural VAR model to assess the impact of monetary policy shocks on different housing indicators. The SVAR model with $p$ lags can be written as
 $$
 \begin{align}
 &B_0Y_t = B_0 + B_1 Y_{t-1} + \dots + B_p Y_{t-p} + U_t\\
@@ -187,7 +252,253 @@ $$
 where $A_i = B_0^{-1}B_i$ and $B_0^{-1}I_N  (B_0^{-1})'$.
 
 
-The identification in the sVAR model can be achieved either by using some exclusion restrictions, sign restrictions, instrumental variables, or prior distribution. The next section will talk about the exact composition of the structural matrix and the conditions for identification. 
+The identification in the SVAR model can be achieved either by using some exclusion restrictions, sign restrictions, instrumental variables, or prior distribution. The next section will talk about the exact composition of the structural matrix and the conditions for identification. 
 
+## Basic Model
+### Identification
+I plan to use exclusion-restrictions to identify the structural matrix $B_0$. In particular, I will employ the solution concept in @waggoner2003b who use a normalization rule as an optimal solution to the local identification problem. I then employ the Gibbs sampler for a SVAR model with exclusion restrictions as in @waggoner2003a.
+
+The Structural VAR model for a N-vector of observations at time $t$  can be written in matrix notation as follows
+```{=tex}
+\begin{align*}
+  
+\end{align*}
+```
+
+
+
+<!-- $$ -->
+<!-- \begin{align*} -->
+<!--   B_0 = -->
+<!--   \begin{bmatrix} -->
+<!--     1 & 0 & 0 & 0  & 0  & 0  & 0  & 0  & 0  \\ -->
+<!--     b_{21} & 1 & & & & & & & \\ -->
+<!--     b_{31} & b_{32} & 1 & & & & & & \\ -->
+<!--     b_{41} & b_{42} &  & 1 & & & & & \\ -->
+<!--     b_{51} & b_{52} & & & 1 & & & & \\ -->
+<!--     b_{61} & b_{62} & & & & 1 & & & \\ -->
+<!--     b_{71} & b_{72} & & & & & 1 & & \\ -->
+<!--     b_{81} & b_{82} & & & & & & 1 & \\ -->
+<!--     b_{91} & b_{92} & & & & & & & 1 -->
+<!--   \end{bmatrix} -->
+<!-- \end{align*} -->
+<!-- $$ -->
+
+The setup of the model is rearranged as
+$$
+\begin{align*}
+  Y = AX + BU
+\end{align*}
+$$
+
+```{r : include code from L16 codes.R}
+  source("L16 codes.R")
+```
+
+
+```{r : set prior parameters, echo=TRUE}
+
+# set the priors
+
+parameters = list(
+  kappa1    = .1,       # autoregressive slope shrinkage
+  kappa2    = 10,      # constant term shrinkage
+  kappa3    = 10,      # contemporaneous effects shrinkage
+  kappa4    = 1,       # VAR prior persistence
+  S         = 5000,
+  S.burnin  = 100
+)
+```
+
+
+```{r : define the prior function, echo=TRUE}
+# A function that computes and stores all the prior distribution components given a parameter list input
+prior     = function(parameters, usedata){
+  priors  = list(
+  B       = cbind(rep(0,usedata$N), parameters$kappa4*diag(usedata$N), matrix(0, usedata$N, (usedata$p-1)*usedata$N)), # random walk prior
+  Omega   = diag(c(parameters$kappa2,parameters$kappa1*((1:usedata$p)^(-2))%x%rep(1,usedata$N))),
+  # Omega = diag(c(parameters$kappa2,parameters$kappa1*rep(1,usedata$N*usedata$p))),
+  S       = parameters$kappa3*diag(usedata$N),
+  nu      = usedata$N
+  )
+}
+```
+
+
+
+```{r : define the posterior function, echo=TRUE}
+posterior     = function(priors, usedata){
+  Omega.inv   = solve(priors$Omega)
+  Omega.post.inv = usedata$X%*%t(usedata$X) + Omega.inv
+  Omega.post  = solve( Omega.post.inv )
+  B.post      = (usedata$Y%*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
+  S.post      = solve(usedata$Y%*%t(usedata$Y) + solve(priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post) )
+  nu.post     = ncol(usedata$Y) + priors$nu
+
+  posteriors  = list(
+  B           = B.post,
+  Omega       = Omega.post,
+  S           = S.post,
+  nu          = nu.post
+)
+}
+
+```
+
+
+```{r : Impose the type of exclusion restriction, echo=TRUE}
+
+ltexclusion = function(usedata){
+  BM.V        = vector("list",usedata$N)
+for (n in 1:usedata$N){
+  BM.V[[n]]   = cbind(diag(n),matrix(0,n,usedata$N-n))
+}
+
+B0.initial    = matrix(0,usedata$N,usedata$N)
+for (n in 1:usedata$N){
+  unrestricted               = apply(BM.V[[n]],2,sum)==1
+  B0.initial[n,unrestricted] = rnorm(sum(unrestricted))
+}
+B0Vlist       = list(B0.initial = B0.initial, V = BM.V)
+}
+```
+
+```{r : function to sample B0 and then B+ using wz2003, echo=TRUE}
+posteriorSimulations  = function(parameters, posteriors, B0Vlist, N){
+  t0                  = proc.time()
+  B0.posterior        = rgn(n=parameters$S.burnin, S.inv=solve(posteriors$S), nu=posteriors$nu, V=B0Vlist$V, B0.initial=B0Vlist$B0.initial)
+  t1                  = proc.time()
+  (t1-t0)/60
+  
+  # sampling B0 from the posterior distribution using Gibbs
+  t0                  = proc.time()
+  B0.posterior        = rgn(n=parameters$S, S.inv=solve(posteriors$S), nu=posteriors$nu, V=B0Vlist$V, B0.initial=B0.posterior[,,parameters$S.burnin])
+  t1                  = proc.time()
+  (t1-t0)/60
+  
+  # normalisation
+  B0.hat              = t(chol((posteriors$nu-N)*posteriors$S))                   # normalisation using this B0.hat should work
+  BM.B0.posterior     = normalize.Gibbs.output.parallel(B0.posterior,B0.hat=B0.hat)
+  t2                  = proc.time()
+  (t2-t1)/60
+  
+  # sample B+ from the normal conditional posterior
+  t2                  = proc.time()
+  BM.Bp.posterior     = rnorm.ngn(BM.B0.posterior, B=posteriors$B,Omega=posteriors$Omega)
+  t3                  = proc.time()
+  (t3-t2)/60
+  
+  list(B0.posterior   = BM.B0.posterior, Bp.posterior = BM.Bp.posterior)
+}
+```
+
+
+```{r : function to compute means for posterior B0 and B+, echo=TRUE}
+posteriorMeans = function(Bposteriors){
+  Bposteriors.means = list(
+  B0 = rowMeans(Bposteriors$B0.posterior, dims = 2),
+  Bp = rowMeans(Bposteriors$Bp.posterior, dims = 2)
+  )
+}
+```
+
+### Simulation Run
+
+```{r : Step 1 - Generate artificial data, eval=TRUE}
+
+set.seed(12345)
+
+sim.p = 1
+sim.T = 1000
+sim.N = 2
+sim.K = 1 + sim.N*sim.p
+
+sim.Y           = arima.sim(list(order = c(0,1,0)), n = sim.T + sim.p-1, mean = 0, sd =1)
+for (i in 2:sim.N){
+  sim.Y         = rbind(sim.Y, arima.sim(list(order = c(0,1,0)), n = sim.T + sim.p-1, mean = 0, sd = 1))
+}
+
+sim.X           = matrix(1,1,sim.T)
+for (i in 1:sim.p){
+  sim.X         = rbind(sim.X, sim.Y[,(sim.p+1-i):(ncol(sim.Y)-i)])
+}
+sim.Y           = sim.Y[,-sim.p]
+artificialdata  = list(p = sim.p, N = sim.N, K = sim.K, Y = sim.Y, X = sim.X)
+
+```
+
+```{r : Step 2 - Compute priors and posteriors for simulated data, echo=TRUE}
+sim.priors      = prior(parameters, artificialdata)
+sim.posteriors  = posterior(sim.priors, artificialdata)
+```
+
+```{r : Step 3 - Impose exclusion restriction on simulated data; get b_n and V_n, echo=TRUE}
+sim.B0Vlist   = ltexclusion(artificialdata)
+```
+
+
+```{r : Step 4 - estimate and draw B0 and B+, save  simulated data, include=TRUE, eval=FALSE}
+
+sim.Bposteriors       = posteriorSimulations(parameters, sim.posteriors, sim.B0Vlist, artificialdata$N)
+save(sim.Bposteriors, sim.priors, sim.posteriors, file = "sim-posteriors.RData")
+
+```
+
+```{r : Step 4b - load saved simulated posteriors, eval=TRUE}
+load(file = "sim-posteriors.RData")
+```
+
+
+```{r : Step 5 - Compute the posterior means of B0 and B+ for simulated data, echo=TRUE}
+sim.Bposteriors.means = posteriorMeans(sim.Bposteriors)
+```
+
+### Data Results
+
+```{r : Step 1 - set lags, create Y and X matrices}
+# Y is N by T; X is K by T
+
+p = 4                                   # set a number of lags included
+N = ncol(df)
+K = 1 + N*p
+
+Y = t(df[(p+1):nrow(df),])
+X = matrix(1,1,ncol(Y))
+
+for (i in 1:p){
+  X    = rbind(X,t(df[((p+1):nrow(df))-i,]))
+}
+
+mydata = list(p=p,N=N,K=K,Y=Y,X=X)
+```
+
+```{r : Step 2 - Compute priors and posteriors}
+priors     = prior(parameters, mydata)
+posteriors = posterior(priors, mydata)
+```
+
+```{r : Step 3 - Impose exclusion restrictions}
+B0Vlist       = ltexclusion(mydata)
+```
+
+```{r : Step 4 - Estimate and sample B0 and B+; save data, eval=FALSE}
+Bposteriors           = posteriorSimulations(parameters, posteriors, B0Vlist, mydata$N)
+save(Bposteriors, priors, posteriors, file = "data-posteriors.RData")
+```
+
+```{r : Step 4b - load saved data posteriors, eval=TRUE}
+load(file = "sim-posteriors.RData")
+```
+
+
+```{r : Step 5 - Compute posterior means for B0 and B+, eval=FALSE}
+Bposterior.means = posteriorMeans(Bposteriors)
+```
+
+
+## Extended Model
+In the extended model, I will estimate the hyperparameters using a triple gamma prior. 
+
+### Identification
 
 ## References {.unnumbered}
