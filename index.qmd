@@ -5,6 +5,10 @@ author: "Yobin Timilsena"
 execute:
   echo: false
   
+format: 
+  html:
+    toc-location: left
+  
 bibliography: references.bib
 ---
 
@@ -104,6 +108,7 @@ homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC
 
 
 ```{r : Step 0 - Load saved data, eval=TRUE, include=FALSE}
+  rm(list = ls())
   load(file = "ProjectData.RData") # load saved empirical data if needed
 
 ```
@@ -111,29 +116,6 @@ homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC
 ## Data Properties
 The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behavior.
 
-```{r visualize the data, include=TRUE, fig.width=11, fig.height=8}
- # m1.qtr %>%
- #  ggplot(data=data.frame(date=index(m1.qtr)), value = coredata(m1.qtr$value)+
- #  aes(x = date, y = value)) +
- #  ggtitle("M1 Money Supply")+
- #  geom_line() +
- #  theme_minimal() +
- #  labs(x = "Year", y = "AU$, billions")+
- #  theme_bw()
-
-par(mfrow = c(3,3))
-plot(m1.qtr, main = "M1 Money Supply (logs)", xlab = "Date", ylab = "AU$, log billions", main.timespan = F)
-plot(cashrate.qtr, main = "RBA Target Cash Rate", xlab = "Date", ylab = "%", main.timespan = F)
-plot(usffr.qtr, main = "US FFR Max Target Rate", xlab = "Date", ylab = "%", main.timespan = F)
-plot(cpi.qtr, main = "% Change in CPI, yoy", xlab = "Date", ylab = "%", main.timespan = F)
-plot(consumption.qtr, main = "Aggregate Consumption (log)", xlab = "Date", ylab = "AU$, billions", main.timespan = F)
-plot(gdp.qtr, main = "Nominal GDP (log)", xlab = "Date", ylab = "AU$, billions", main.timespan = F)
-plot(homeloan.qtr, main = "Owner-occupied home loan rates", xlab = "Date", ylab = "%", main.timespan = F)
-plot(nhomes.qtr, main = "Quantity of homes", xlab = "Date", main.timespan = F)
-plot(homeprice.qtr, main = "House Price Index", xlab = "Date", main.timespan = F)
-
-
-```
 
 The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q4, including 74 observations, plots of truncated dataset is shown as: 
 ```{r : truncating data}
@@ -144,32 +126,51 @@ df["% Change in CPI, yoy"]              <- as.numeric(cpi.qtr[269:length(cpi.qtr
 df["Aggregate Consumption (log)"]       <- as.numeric(tail(consumption.qtr,nrow(df)))
 df["Nominal GDP (log)"]                 <- as.numeric(tail(gdp.qtr,nrow(df)))
 df["Owner-occupied home loan rates"]    <- as.numeric(tail(homeloan.qtr,nrow(df)+1))[-133]
-df["Quantity of homes"]                 <- as.numeric(tail(nhomes.qtr,nrow(df)+1))[-133]
+df["Quantity of new homes"]                 <- as.numeric(tail(nhomes.qtr,nrow(df)+1))[-133]
 df                                      <- head(df,-4) # drop the last 4 obs 
 df["House Price Index"]                 <- NA 
 df[55:128,"House Price Index"]          <- as.numeric(homeprice.qtr)
 df                                      <- na.omit(df)
 ```
 
-```{r, include=FALSE}
-names <- colnames(df)
-par(mfrow = c(3,3))
+```{r, echo=TRUE}
+var_names <- colnames(df)
+date_range <- as.yearqtr(rownames(df), format = "%Y Q%q")
+par(mfrow = c(3,3), mar=c(2,2,2,2))
 for (j in 1:ncol(df)){
-  plot(df[,j],ylab = "", xlab = "",,type='l', main = paste(names [j]),lwd = 2.5)
+  plot(x = date_range, y = df[,j],,type='l',
+       main = paste(var_names[j]), ylab = "", xlab = "",
+       lwd = 2.5,
+       ylim = c(min(df[,j]),max(df[,j])))
 }
 
 ```
 
- <!-- ```{r integration order} -->
+```{r}
+library(plotly)
+var_names <- colnames(df)
+date_range <- as.yearqtr(rownames(df), format = "%Y Q%q")
 
- <!-- adf = tseries::adf.test(m1.qtr, k = 4) -->
- <!-- diff_adf = tseries::adf.test(na.omit(diff(m1.qtr)), k = 3) -->
- <!-- FinTS::Acf(m1.qtr) -->
- <!-- # please use the outputs to create a table reporting test statistic, p-value, the variable (and transformation), lag order. Write a conclusion regarding the integration order. -->
+# Create an empty list to store plotly plots
+plots <- list()
 
- <!-- ``` -->
- 
+# Loop through each variable and create plotly plots
+for (j in 1:ncol(df)) {
+  p <- plot_ly() %>%
+    add_lines(x = date_range, y = df[, j], name = var_names[j]) %>%
+    layout(title = var_names[j], xaxis = list(title = ""), yaxis = list(title = ""), showlegend = FALSE)
+  plots[[j]] <- p
+}
 
+# Combine the plots into a single subplot
+subplot <- subplot(plotlist = plots, nrows = 3, margin = 0.1)
+
+# Display the interactive subplot
+subplot
+
+```
+
+### ADF Tests
 Next, I perform and display ADF test results on the variables. I report, for each variable, the difference level at which the ADF tests rejects the null that the series is non-stationary. 
 
 ```{r : perform adf tests on the data, warning= FALSE, echo=TRUE}
@@ -228,10 +229,27 @@ adf_test_results <- perform_adf_tests(df)
 rmarkdown::paged_table(adf_test_results)
 
 ```
+### ACF Plots
+```{r : ACF, include=TRUE}
+par(mfrow = c(3,3), mar=c(2,2,2,2))
+for (j in 1:ncol(df)){
+  acf(df[,j], xlab="")
+  title(main=var_names[j])
+}
+
+```
+### PACF Plots
+```{r : PACF, include=TRUE}
+par(mfrow = c(3,3), mar=c(2,2,2,2))
+for (j in 1:ncol(df)){
+  pacf(df[,j], xlab="")
+  title(main=var_names[j])
+}
+```
 
 
 # Model and Hypothesis
-I employ a strutural VAR model to assess the impact of monetary policy shocks on different housing indicators. The SVAR model with $p$ lags can be written as
+I employ a structural VAR model to assess the impact of monetary policy shocks on different housing indicators. The SVAR model with $p$ lags can be written as
 $$
 \begin{align}
 &B_0Y_t = B_0 + B_1 Y_{t-1} + \dots + B_p Y_{t-p} + U_t\\
@@ -258,14 +276,66 @@ The identification in the SVAR model can be achieved either by using some exclus
 ### Identification
 I plan to use exclusion-restrictions to identify the structural matrix $B_0$. In particular, I will employ the solution concept in @waggoner2003b who use a normalization rule as an optimal solution to the local identification problem. I then employ the Gibbs sampler for a SVAR model with exclusion restrictions as in @waggoner2003a.
 
-The Structural VAR model for a N-vector of observations at time $t$  can be written in matrix notation as follows
-```{=tex}
-\begin{align*}
-  
-\end{align*}
+$$ B_0 Y = B_+ X + U, \qquad \qquad U|X \sim \mathcal{MN}_{N \times T}(\textbf{0}_{N \times T}, I_T, I_N) $$
+where 
+
+$B_0$ is a $N \times N$ contemporaneous effects matrix.
+
+$Y = [y_1, \dots, y_T]$ is a $N \times T$ matrix of observations.
+
+$B_+ = [B_d, B_1, \dots, B_p]$ is a $N \times K$ matrix of autoregressive parameters, where $K = Np + d$  ($d$ is the number of deterministic terms; $p$ is the number of lags).
+
+$X = [x_1, \dots, x_T]$ is a $K \times T$ matrix of lagged observations where each $x_t = (1, y_{t-1}, \dots, y_{t-p})'$.
+
+$U = [u_1, \dots, u_T]$ is a $N \times T$ matrix of structural shocks.
+
+For convenience of coding and inference purposes, we consider a row-wise equation form as follows:
+$$ B_{0[n.\cdot]} Y = B_{+n} X + U_n, \qquad \qquad U_n|X \sim \mathcal{N}(\mathbf{0}_T, I_T) $$
+
+If $r_n$ denotes the number of elements in the $n^{th}$ row of $B_0$ that stay unrestricted, then we can further decompose $B_{0[n.\cdot]}$ into $b_n$ and $V_n$. 
+
+$b_n$ is a $1 \times r_n$ vector of unrestricted elements in the $n^{th}$ row of $B_0$.
+
+$V_n$ is a $r_n \times N$ matrix which places elements of $b_n$ in the appropriate positions to impose the restrictions on $B_0$. 
+
+Then, the row-wise equation form can be written as follows:
+$$ b_n V_n Y = B_{+n} X + U_n, \qquad \qquad U_n|X \sim \mathcal{N}(\mathbf{0}_T, I_T) $$
+Following @waggoner2003a and @arias2018a, we define that $(B_+, B_0)$ follow jointly a Normal-Generalised Normal (NGN) distribution denoted as 
+$$ p(B_+, B_0) \sim \mathcal{NGN}(B, \Omega, S, \nu)$$ 
+
+if $B_{+n}$ follows a K-variate normal distribution given $b_n$ 
+$$ p(B_{+n}|b_n) = \mathcal{N}_k(b_nV_nB, \Omega) $$  with kernel $$ p(B_{+n}|b_n) \propto \exp \left\{  -\frac{1}{2} \left( B_{+n} - b_nV_nB \right) \Omega^{-1}  \left( B_{+n} - b_nV_nB \right)' \right\} $$
+
+
+for $n = 1, \dots, N$ and $b_1, \dots, b_N$ jointly have a distribution whose kernel is specified by 
+$$ p(b_1, \dots, b_N) \propto | \det(B_0) |^{\nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n S^{-1} V_n' b_n'  \right\} $$
+
+The joint-distribution of $(B_+, B_0)$ can then be written as
+$$ p(B_0, B_+) = \left( \prod_{n=1}^N p(B_{+n}|b_n)\right) p(b_1, \dots, b_N) $$
+
+```{r : Impose the type of exclusion restriction, echo=TRUE}
+
+ltexclusion = function(usedata){
+  BM.V        = vector("list",usedata$N)
+for (n in 1:usedata$N){
+  BM.V[[n]]   = cbind(diag(n),matrix(0,n,usedata$N-n))
+}
+
+B0.initial    = matrix(0,usedata$N,usedata$N)
+for (n in 1:usedata$N){
+  unrestricted               = apply(BM.V[[n]],2,sum)==1
+  B0.initial[n,unrestricted] = rnorm(sum(unrestricted))
+}
+B0Vlist       = list(B0.initial = B0.initial, V = BM.V)
+}
 ```
 
+### Prior distribution
+Given this parameterisation, we can write down the kernel of the **prior** given hyperparameters $(\underline B, \underline \Omega, \underline S, \underline \nu)$ as follows:
+$$ | \det(B_0) |^{\underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n \underline S^{-1} V_n' b_n'  \right\}  \exp \left\{  -\frac{1}{2}  \sum_{n=1}^N  \left( B_{+n} - b_nV_n \underline B \right) \underline \Omega^{-1}  \left( B_{+n} - b_nV_n \underline B \right)' \right\}  $$
+This prior distribution has two key advantages. Firstly, it leads to a full-conditional posterior distributions that allow efficient sampling. This allows us to estimate the structural parameters of the SVAR model.
 
+Secondly, it belongs to a class of reference prior distributions that are invariant to the pre-multiplication of the parameter matrices by a rotation matrix up to which the system is identified (see @rr2010). This allows us to conduct a proper Bayesian treatment of this model given the identification above.
 
 <!-- $$ -->
 <!-- \begin{align*} -->
@@ -284,17 +354,29 @@ The Structural VAR model for a N-vector of observations at time $t$  can be writ
 <!-- \end{align*} -->
 <!-- $$ -->
 
-The setup of the model is rearranged as
-$$
-\begin{align*}
-  Y = AX + BU
-\end{align*}
-$$
 
 ```{r : include code from L16 codes.R}
   source("L16 codes.R")
 ```
 
+#### Calibration of the prior
+- $\underline \nu = N$ is a commonly chosen value as it implies that the generalised-normal part is equivalent to a $r_n$-variate normal with the mean equal to a vector of zeros and the covariance matrix equal to $\underline S$.
+- $\underline S = \kappa_3 I_N$ implies that the covariances across the rows of $B_0$ is zero, and the variance of each row is homoskedastic (constant). $\kappa_3$ can be interpreted as a contemporaneous effects shrinkage and is set to 10.
+- $\underline B = [0_{N \times 1} \; \kappa_4 I_N \; 0_{N \times (p-1)N}]$ implies an AR1 process for the structural VAR at the prior mean. In this calibration, $\kappa_4 = 1$, the AR1 process is a random walk process.
+- $\underline \Omega = \begin{pmatrix} \kappa_2 & 0\\ 0 & \kappa_1 I_{Np} \end{pmatrix}$ is the prior covariance matrix. It is taken to be a diagonal matrix with the diagonal elements set as the Litterman prior. $\kappa_2$ represents the constant term shrinkage and is set to 10. $\kappa_1$ represents the autoregressive slope shrinkage and is set to 0.1.
+
+```{r : define the prior function, echo=TRUE}
+# A function that computes and stores all the prior distribution components given a parameter list input
+prior     = function(parameters, usedata){
+  priors  = list(
+  B       = cbind(rep(0,usedata$N), parameters$kappa4*diag(usedata$N), matrix(0, usedata$N, (usedata$p-1)*usedata$N)), # random walk prior
+  Omega   = diag(c(parameters$kappa2,parameters$kappa1*((1:usedata$p)^(-2))%x%rep(1,usedata$N))),
+  # Omega = diag(c(parameters$kappa2,parameters$kappa1*rep(1,usedata$N*usedata$p))),
+  S       = parameters$kappa3*diag(usedata$N),
+  nu      = usedata$N
+  )
+}
+```
 
 ```{r : set prior parameters, echo=TRUE}
 
@@ -310,22 +392,64 @@ parameters = list(
 )
 ```
 
+We also calibrate the number of draws $S = 5000$ for any sampling, while the $S.burnin = 100$ represents the number of draws that are sampled first and then discarded.
 
-```{r : define the prior function, echo=TRUE}
-# A function that computes and stores all the prior distribution components given a parameter list input
-prior     = function(parameters, usedata){
-  priors  = list(
-  B       = cbind(rep(0,usedata$N), parameters$kappa4*diag(usedata$N), matrix(0, usedata$N, (usedata$p-1)*usedata$N)), # random walk prior
-  Omega   = diag(c(parameters$kappa2,parameters$kappa1*((1:usedata$p)^(-2))%x%rep(1,usedata$N))),
-  # Omega = diag(c(parameters$kappa2,parameters$kappa1*rep(1,usedata$N*usedata$p))),
-  S       = parameters$kappa3*diag(usedata$N),
-  nu      = usedata$N
-  )
-}
-```
+### Likelihood Function
+The conditional normality of the error term allows us to write the kernel of the likelihood function and show that it can be expressed as a NGN distribution.
+$$
+\begin{align*}
+    &L(B_+, B_0|Y,X) \propto | \det(B_0^{-1}B_0^{-1'})|^{-\frac{T}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left(b_n V_n Y - B_{+n} X \right) \left( b_n V_n Y - B_{+n} X  \right)' \right\}\\
+    & = | \det(B_0)|^{T} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left( b_n V_n Y Y' V_n' b_n' - 2 b_n V_n Y X' B_{+n}' + B_{+n} X X' B_{+n}' \right) \right\}\\
+    & = | \det(B_0)|^{T} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left( b_n V_n Y Y' V_n' b_n' + B_{+n} X X' B_{+n}' - 2 b_n V_n Y X' (XX')^{-1} (XX') B_{+n}' \right. \right. \\
+    & \left. \left. + b_n V_n Y X' (XX')^{-1} (XX') (XX')^{-1} XY'V_n'b_n' - b_n V_n Y X' (XX')^{-1} (XX') (XX')^{-1} XY'V_n'b_n' \right) \right\}\\
+    & = | \det(B_0)|^{T} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left( b_n V_n [ YY' - YX'(XX')^{-1}XY'] V_n' b_n'  + B_{+n} X X' B_{+n}' \right. \right. \\
+    & \left. \left. - 2 b_n V_n Y X' (XX')^{-1} (XX') B_{+n}' + b_n V_n Y X' (XX')^{-1} XY' V_n' b_n' \right) \right\}\\
+    & \text{}\\
+    & \text{Let $\hat A = YX' (XX')^{-1} $, then we can simplify}\\
+    & \text{}\\
+    & =  | \det(B_0)|^{T} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left( b_n V_n [ YY' - \hat A XY'] V_n' b_n'  + B_{+n} X X' B_{+n}' - 2 b_n V_n \hat A (XX') B_{+n}' \right. \right.\\ & \left. \left. + b_n V_n \hat A XY' V_n' b_n' \right) \right\}\\
+    & =  | \det(B_0)|^{T} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left( b_n V_n [ YY' - \hat A XY'] V_n' b_n'  + (B_{+n} - b_n V_n \hat A) X X' (B_{+n} - b_n V_n \hat A)' \right) \right\}\\
+    & =  | \det(B_0)|^{T} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n [ YY' - \hat A XY'] V_n' b_n' \right\} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \hat A) X X' (B_{+n} - b_n V_n \hat A)' \right\}
+\end{align*}
+$$
 
+Comparing this with the general NGN kernel, we can write that
 
+$$ L(B_+, B_0|Y, X) = \mathcal{NGN}(\tilde B, \tilde \Omega, \tilde S, \tilde \nu) $$
+where
 
+$$ \tilde B = \hat A, \quad \tilde \Omega = (XX')^{-1}, \quad \tilde S = ( YY' - \hat A XY')^{-1}, \quad \tilde \nu = T + N. $$
+Hence, we have shown that the likelihood function follows a NGN distribution.
+
+### Posterior Distribution
+The prior and the likelihood can be used to obtain the posterior as follows:
+
+$$
+\begin{align*}
+    & p(B_+, B_0|Y, X)  \propto L(B_+, B_0|Y, X) p(B_0, B_+)\\
+    & = | \det(B_0)|^{T} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left(b_n V_n Y - B_{+n} X \right) \left( b_n V_n Y - B_{+n} X  \right)' \right\}\\
+    & \times | \det(B_0) |^{\underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n \underline S^{-1} V_n' b_n'  \right\}  \exp \left\{  -\frac{1}{2}  \sum_{n=1}^N  \left( B_{+n} - b_nV_n \underline B \right) \underline \Omega^{-1}  \left( B_{+n} - b_nV_n \underline B \right)' \right\} \\
+    & =  | \det(B_0) |^{T + \underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N \left(b_n V_n Y Y' V_n' b_n' - 2 b_n V_n Y X' B_{+n}' + B_{+n} X X' B_{+n}' \right) \right.\\
+    & \left. + b_n V_n \underline S^{-1} V_n' b_n' + B_{+n} \underline \Omega^{-1} B_{+n}' - 2 b_n V_n \underline B \underline \Omega^{-1} B_{+n}' + b_n V_n \underline B \underline \Omega^{-1} \underline B' V_n' b_n' \right\}\\
+    & =  | \det(B_0) |^{T + \underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n [ YY' + \underline S^{-1} + \underline B \underline \Omega^{-1} \underline B'] V_n' b_n' - 2 b_n V_n [ YX' + \underline B \underline \Omega^{-1} ] B_{+n}' \right.\\
+    & \left. + B_{+n} [ XX' + \underline \Omega^{-1} ] B_{+n}' \right\}\\ & \text{}\\
+    & \text{ Let $ \bar \Omega = (XX' + \underline \Omega^{-1})^{-1} $, then we can write}\\ & \text{}\\
+    & =  | \det(B_0) |^{T + \underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n [ YY' + \underline S^{-1} + \underline B \underline \Omega^{-1} \underline B'] V_n' b_n' - 2 b_n V_n [ YX' + \underline B \underline \Omega^{-1} ] \bar \Omega \bar \Omega^{-1} B_{+n}' \right.\\
+    & \left. + B_{+n} \bar \Omega^{-1} B_{+n}' \right\}\\
+    & \text{}\\
+    & \text{ Let $ \bar B = (YX' + \underline B \underline \Omega^{-1}) \bar \Omega $, then we can write}\\ & \text{}\\
+    & =  | \det(B_0) |^{T + \underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n [ YY' + \underline S^{-1} + \underline B \underline \Omega^{-1} \underline B' - \bar B \bar \Omega^{-1} \bar B' ] V_n' b_n'  \right.\\
+    & \left.  + b_n V_n  \bar B \bar \Omega^{-1} \bar B' V_n' b_n' - 2 b_n V_n \bar B \bar \Omega^{-1} B_{+n}' + B_{+n} \bar \Omega^{-1} B_{+n}' \right\}\\
+    & \text{}\\
+    & \text{ Define $ \bar S = (YY' + \underline S^{-1} + \underline B \underline \Omega^{-1} \underline B' - \bar B \bar \Omega^{-1} \bar B')^{-1} $, then we can write}\\ & \text{}\\
+    & =  | \det(B_0) |^{T + \underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n \bar S^{-1} V_n' b_n'  + (B_{+n} - b_n V_n \bar B) \bar \Omega^{-1} (B_{+n} - b_n V_n \bar B)' \right\}\\
+    &  = | \det(B_0) |^{T + \underline \nu - N} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n \bar S^{-1} V_n' b_n'  \right\} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \bar B) \bar \Omega^{-1} (B_{+n} - b_n V_n \bar B)' \right\}
+\end{align*}
+$$
+Thus, $$ p(B_+, B_0|Y,X) \sim \mathcal{NGN}(\bar B, \bar \Omega, \bar S, \bar \nu) $$
+where the first three parameters are defined above and $\bar \nu = T + \underline \nu$.
+
+The following `R` function uses the prior and information contained in data to compute and store (as a list) the set of posterior parameters for our model. 
 ```{r : define the posterior function, echo=TRUE}
 posterior     = function(priors, usedata){
   Omega.inv   = solve(priors$Omega)
@@ -346,23 +470,8 @@ posterior     = function(priors, usedata){
 ```
 
 
-```{r : Impose the type of exclusion restriction, echo=TRUE}
 
-ltexclusion = function(usedata){
-  BM.V        = vector("list",usedata$N)
-for (n in 1:usedata$N){
-  BM.V[[n]]   = cbind(diag(n),matrix(0,n,usedata$N-n))
-}
-
-B0.initial    = matrix(0,usedata$N,usedata$N)
-for (n in 1:usedata$N){
-  unrestricted               = apply(BM.V[[n]],2,sum)==1
-  B0.initial[n,unrestricted] = rnorm(sum(unrestricted))
-}
-B0Vlist       = list(B0.initial = B0.initial, V = BM.V)
-}
-```
-
+The following is the code to sample using the Gibbs sampler. More information on the specifics of this code will be added soon.
 ```{r : function to sample B0 and then B+ using wz2003, echo=TRUE}
 posteriorSimulations  = function(parameters, posteriors, B0Vlist, N){
   t0                  = proc.time()
@@ -392,7 +501,7 @@ posteriorSimulations  = function(parameters, posteriors, B0Vlist, N){
 }
 ```
 
-
+This function computes the sample average of the $B_0$ and $B_+$ matrices obtained from each sampling step.
 ```{r : function to compute means for posterior B0 and B+, echo=TRUE}
 posteriorMeans = function(Bposteriors){
   Bposteriors.means = list(
@@ -404,7 +513,8 @@ posteriorMeans = function(Bposteriors){
 
 ### Simulation Run
 
-```{r : Step 1 - Generate artificial data, eval=TRUE}
+The following code generates artificial data containing 1000 observations from a bi-variate Gaussian random walk process with the covariance matrix equal to the identity matrix of order 2.
+```{r : Step 1 - Generate artificial data, echo=TRUE}
 
 set.seed(12345)
 
@@ -427,16 +537,18 @@ artificialdata  = list(p = sim.p, N = sim.N, K = sim.K, Y = sim.Y, X = sim.X)
 
 ```
 
+We obtain a list of simulation priors and posteriors. 
 ```{r : Step 2 - Compute priors and posteriors for simulated data, echo=TRUE}
 sim.priors      = prior(parameters, artificialdata)
 sim.posteriors  = posterior(sim.priors, artificialdata)
 ```
 
+We create a list of $V_n$ and $b_n$ corresponding to a lower triangular exclusion restriction on $B_0$.
 ```{r : Step 3 - Impose exclusion restriction on simulated data; get b_n and V_n, echo=TRUE}
 sim.B0Vlist   = ltexclusion(artificialdata)
 ```
 
-
+We sample the $B_0$ and $B_p$ posteriors using the Gibbs sampler, and save the data for future use.
 ```{r : Step 4 - estimate and draw B0 and B+, save  simulated data, include=TRUE, eval=FALSE}
 
 sim.Bposteriors       = posteriorSimulations(parameters, sim.posteriors, sim.B0Vlist, artificialdata$N)
@@ -448,10 +560,35 @@ save(sim.Bposteriors, sim.priors, sim.posteriors, file = "sim-posteriors.RData")
 load(file = "sim-posteriors.RData")
 ```
 
-
-```{r : Step 5 - Compute the posterior means of B0 and B+ for simulated data, echo=TRUE}
-sim.Bposteriors.means = posteriorMeans(sim.Bposteriors)
+```{r : function to print matrix in latex format, results='asis'}
+pmatrix <- function(x) {
+  cat(c("$$\\begin{equation*}\n",
+    "\\left(",
+    knitr::kable(x, format = "latex", 
+                 tabular = "array",
+                 vline = "",
+                 align = "c",
+                 linesep = "",
+                 toprule = NULL,
+                 bottomrule = NULL),
+    "\n\\right)\\, .\n",
+    "\\end{equation*}$$\n"))
+}
 ```
+
+
+```{r : Step 5a - Compute the posterior means of B0 for simulated data, echo=TRUE, results='asis'}
+sim.Bposteriors.means = posteriorMeans(sim.Bposteriors)
+sim_B0 = pmatrix(sim.Bposteriors.means$B0)
+```
+We can see that the computed $B_0$ covariance matrix is numerically identical to an identity matrix.
+
+```{r : Step 5b - Compute the posterior means of Bp for simulated data, echo=TRUE, results='asis'}
+sim_Bp = pmatrix(sim.Bposteriors.means$Bp)
+```
+The first column of $B_+$ represents the posterior mean of the constant term. The values are small and close to zero.
+The rest of the $B_+$ matrix represents the autoregressive matrix. Its posterior mean is numerically equal to an identity matrix.
+
 
 ### Data Results
 
@@ -497,7 +634,7 @@ Bposterior.means = posteriorMeans(Bposteriors)
 
 
 ## Extended Model
-In the extended model, I will estimate the hyperparameters using a triple gamma prior. 
+In the extended model, I will estimate the hyperparameters using a GIG prior. 
 
 ### Identification
 
