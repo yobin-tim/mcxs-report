@@ -592,7 +592,7 @@ The rest of the $B_+$ matrix represents the autoregressive matrix. Its posterior
 
 ### Data Results
 
-```{r : Step 1 - set lags, create Y and X matrices}
+```{r : Step 1 - set lags, create Y and X matrices, echo=TRUE}
 # Y is N by T; X is K by T
 
 p = 4                                   # set a number of lags included
@@ -609,33 +609,170 @@ for (i in 1:p){
 mydata = list(p=p,N=N,K=K,Y=Y,X=X)
 ```
 
-```{r : Step 2 - Compute priors and posteriors}
+```{r : Step 2 - Compute priors and posteriors, echo=TRUE}
 priors     = prior(parameters, mydata)
 posteriors = posterior(priors, mydata)
 ```
 
-```{r : Step 3 - Impose exclusion restrictions}
+```{r : Step 3 - Impose exclusion restrictions, echo=TRUE}
 B0Vlist       = ltexclusion(mydata)
 ```
 
-```{r : Step 4 - Estimate and sample B0 and B+; save data, eval=FALSE}
+```{r : Step 4 - Estimate and sample B0 and B+; save data, eval=FALSE, include=TRUE}
 Bposteriors           = posteriorSimulations(parameters, posteriors, B0Vlist, mydata$N)
 save(Bposteriors, priors, posteriors, file = "data-posteriors.RData")
 ```
 
 ```{r : Step 4b - load saved data posteriors, eval=TRUE}
-load(file = "sim-posteriors.RData")
+load(file = "data-posteriors.RData")
 ```
 
 
-```{r : Step 5 - Compute posterior means for B0 and B+, eval=FALSE}
+```{r : Step 5 - Compute posterior means for B0 and B+, echo=TRUE, results='asis'}
 Bposterior.means = posteriorMeans(Bposteriors)
+data_B0 = pmatrix(Bposterior.means$B0)
 ```
-
+```{r : Step 5b - Compute the posterior means of Bp for actual data, echo=TRUE, results='asis'}
+data_Bp = pmatrix(Bposterior.means$Bp)
+```
 
 ## Extended Model
-In the extended model, I will estimate the hyperparameters using a GIG prior. 
+In the extended model, I will estimate the hyperparameters rather than setting them exogenously. Such estimation procedure often improves the fit of the model especially because the results can be sensitive to the parameterisation of the hyperparameters. 
+In particular, I estimate $(\kappa_0, \kappa_+)$ such that $\underline S = \kappa_0 I_N$ and $\underline \Omega = \kappa_+ I_K$.
 
-### Identification
+I postulate the following prior distributions for the hyperparameters:
+$$
+\begin{align*}
+    \kappa_0 | \underline s_{\kappa_0}, \underline \nu_{\kappa_0} \sim \mathcal{IG}2(\underline s_{\kappa_0}, \underline \nu_{\kappa_0})  && \kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} \sim \mathcal{G}(2 \underline s_{\kappa_+}, \frac{1}{2} \underline \nu_{\kappa_+}) 
+  \end{align*}
+$$
+
+
+```{r : hyperparameter priors, echo=TRUE}
+ext.priors = function(parameters,usedata){
+  ext.prior = list(
+  kappa0.s = .1,
+  kappa0.nu = 1,
+  kappap.s = .1,
+  kappap.nu = 1,
+  B       = cbind(rep(0,usedata$N), diag(usedata$N), matrix(0, usedata$N, (usedata$p-1)*usedata$N)), # random walk prior
+  Omega   = parameters$kappa1 * diag(usedata$K),
+  S       = parameters$kappa3*diag(usedata$N),
+  nu      = usedata$N
+)
+}
+```
+
+
+Moreover, we have 
+$$
+  \begin{align*}
+    p(B_{+n}|b_n, \kappa_+) = \mathcal{N}_k (b_n V_n B, \kappa_+ \Omega) && p(b_n| \kappa_0) = \mathcal{N}_{r_n}(0, \kappa_0 S)
+  \end{align*}
+$$
+  Thus, posteriors
+  $$
+\begin{align*}
+    & p(\kappa_0 | Y, X, B_0) \propto p(B_0|\kappa_0) p(\kappa_0 | \underline s_{\kappa_0}, \underline \nu_{\kappa_0} )\\
+    & \propto \kappa_0^{-\frac{N}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n (\kappa_0 I_N)^{-1} V_n' b_n'  \right\} \cdot \kappa_0^{-\frac{\underline \nu_{\kappa_0}+2}{2}} \exp \left\{  -\frac{\underline s_{\kappa_0}}{2 \kappa_0} \right\}\\ 
+    & \propto \kappa_0^{ -\frac{\underline \nu_{\kappa_0} + 2 + N}{2}} \cdot \exp \left\{  -\frac{1}{2 \kappa_0} \sum_{n=1}^N b_n V_n V_n' b_n' + \underline s_{\kappa_0} \right\}\\
+  \end{align*}
+  $$
+  This gives
+  $$ \bar s_{\kappa_0} =  \sum_{n=1}^N b_n V_n V_n' b_n' + \underline s_{\kappa_0}. $$
+  $$ \bar \nu_{\kappa_0} = \underline \nu_{\kappa_0} +N $$
+  Also,
+  $$
+  \begin{align*}
+    & p(\kappa_+ | Y, X, B_+, B_0, \kappa_0) \propto p(B_+|\kappa_+, B_0, \kappa_0) p(\kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} )\\
+    & \propto \kappa_+^{-\frac{N}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \underline B) (\kappa_+ I_{K})^{-1} (B_{+n} - b_n V_n \underline B)'  \right\} \cdot \kappa_+^{-\frac{\underline \nu_{\kappa_+} + 2}{2}} \exp \left\{  -\frac{ \kappa_+}{2 \underline s_{\kappa_+}} \right\}\\
+    & = \kappa_+^{-\frac{\underline \nu_{\kappa_+} + N}{2} - 1} \cdot \exp \left\{  -\frac{1}{2} \left( (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' \cdot \frac{1}{\kappa_+} + \frac{1}{\underline s_{\kappa_+}} \kappa_+  \right) \right\}\\
+  \end{align*}
+  $$
+  This gives
+  $$ \lambda = -\frac{\underline \nu_{\kappa_+} + N}{2} $$
+  $$ \chi =  \sum_{n=1}^N  (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' $$
+  $$  \Psi = \frac{1}{\underline s_{\kappa_+}} $$
+  
+  A structure function is written that creates matrices to store draws of $\{\kappa_0^{(s)}, \kappa_+^{(s)}, B_0^{(s)}, B_+^{(s)}\}_{s =1}^{S}$.
+```{r : Structures, echo=TRUE}
+  init.struct = function(usedata,S){
+    kappa0 = array(NA,c(1,S))
+    kappa0[1] = 10
+    kappap = rep(NA, S)
+    kappap[1] = 1
+    B0.post = array(NA, c(usedata$N,usedata$N,S))
+    Bp.post = array(NA, c(usedata$N,usedata$K,S))
+    list(kappa0 = kappa0, kappap = kappap, B0.post = B0.post, Bp.post = Bp.post)
+  }
+```
+
+The sampling function is given below.
+
+```{r : Sampling, echo=TRUE}
+ext.sampling = function(parameters, struct, priors, usedata){
+  B0Vlist.initial = ltexclusion(usedata)
+  B0.initial = B0Vlist.initial$B0
+  for (i in 1:(parameters$S + parameters$S.burnin)){
+    
+    # Computing posterior parameters for each draw
+    Omega.inv      = solve(struct$kappap[i] * priors$Omega)
+    Omega.post.inv = usedata$X%*%t(usedata$X) + Omega.inv
+    Omega.post     = solve(Omega.post.inv)
+    B.post         = (usedata$Y%*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
+    S.post         = solve(usedata$Y%*%t(usedata$Y) + solve(struct$kappa0[i] * priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post) )
+    nu.post        = ncol(usedata$Y) + priors$nu
+
+
+  if (i > 1){
+    B0.initial = struct$B0.post[,,i-1]
+  }
+  
+  B0.i = rgn(n=1, S.inv = solve(S.post), nu = nu.post, V = B0Vlist.initial$V, B0.initial = B0.initial)
+  B0.hat = t(chol((nu.post - usedata$N)*S.post))
+  B0.norm.i = normalize.Gibbs.output.parallel(B0.i, B0.hat)
+  Bp.i = rnorm.ngn(B0.norm.i, B.post, Omega.post)
+  
+  struct$B0.post[,,i] = B0.norm.i
+  struct$Bp.post[,,i] = Bp.i
+  
+  # Now, update kappa
+  kappa0.nu.post = priors$kappa0.nu + usedata$N
+  kappap.lambda.post = -(priors$kappap.nu + usedata$N)/2
+  kappap.psi.post = 1/priors$kappap.s
+  kappa0.s.post = priors$kappa0.s
+  # kappap.chi.post = 0
+  for (n in 1:usedata$N){
+    # kappa0.s.post = kappa0.s.post + B0.norm.i[n,,1] %*% t( B0.norm.i[n,,1])
+    kappa0.s.post = kappa0.s.post + sum(B0.norm.i[n,,1]^2)
+    kappap.chi.post = (Bp.i[n,,1] - B0.norm.i[n,,1] %*% B.post) %*% t(Bp.i[n,,1] - B0.norm.i[n,,1] %*% B.post)
+  }
+  
+  if (i != (parameters$S + parameters$S.burnin)){
+    struct$kappa0[i+1] = kappa0.s.post / rchisq(n=1,df = kappa0.nu.post)
+    struct$kappap[i+1] = GIGrvg::rgig(n=1, kappap.lambda.post, kappap.chi.post, kappap.psi.post)
+  }
+  }
+  return(struct)
+  
+}
+
+```
+
+The following code computes the prior, initialises matrices to store results, and samples the draws for the simulated data.
+```{r : Running extension for simulated data, eval = FALSE, include=TRUE}
+ext.sim.prior = ext.priors(parameters, artificialdata)
+ext.sim.struct = init.struct(artificialdata, parameters$S + parameters$S.burnin)
+ext.sim.sample <- ext.sampling(parameters, ext.sim.struct, ext.sim.prior, artificialdata)
+```
+The following code computes the prior, initialises matrices to store results, and samples the draws for the actual data.
+```{r : Running extension for actual data, eval = FALSE, include=TRUE}
+ext.prior = ext.priors(parameters, mydata)
+ext.struct = init.struct(mydata, parameters$S + parameters$S.burnin)
+ext.sample <- ext.sampling(parameters, ext.sim.struct, ext.sim.prior, mydata)
+```
+
+# Empirical Investigation
+
 
 ## References {.unnumbered}
