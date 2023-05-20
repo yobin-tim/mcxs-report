@@ -674,23 +674,23 @@ $$
   $$
 \begin{align*}
     & p(\kappa_0 | Y, X, B_0) \propto p(B_0|\kappa_0) p(\kappa_0 | \underline s_{\kappa_0}, \underline \nu_{\kappa_0} )\\
-    & \propto \kappa_0^{-\frac{N}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n (\kappa_0 I_N)^{-1} V_n' b_n'  \right\} \cdot \kappa_0^{-\frac{\underline \nu_{\kappa_0}+2}{2}} \exp \left\{  -\frac{\underline s_{\kappa_0}}{2 \kappa_0} \right\}\\ 
-    & \propto \kappa_0^{ -\frac{\underline \nu_{\kappa_0} + 2 + N}{2}} \cdot \exp \left\{  -\frac{1}{2 \kappa_0} \sum_{n=1}^N b_n V_n V_n' b_n' + \underline s_{\kappa_0} \right\}\\
+    & \propto \prod_{n=1}^{N}\left(\kappa_0^{-\frac{1}{2}}\right)^{r_n} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n (\kappa_0 I_N)^{-1} V_n' b_n'  \right\} \cdot \kappa_0^{-\frac{\underline \nu_{\kappa_0}+2}{2}} \exp \left\{  -\frac{\underline s_{\kappa_0}}{2 \kappa_0} \right\}\\ 
+    & \propto \kappa_0^{ -\frac{\underline \nu_{\kappa_0} + 2 + \sum_{n=1}^{N}r_n}{2}} \cdot \exp \left\{  -\frac{1}{2 \kappa_0} \sum_{n=1}^N b_n V_n V_n' b_n' + \underline s_{\kappa_0} \right\}\\
   \end{align*}
   $$
   This gives
   $$ \bar s_{\kappa_0} =  \sum_{n=1}^N b_n V_n V_n' b_n' + \underline s_{\kappa_0}. $$
-  $$ \bar \nu_{\kappa_0} = \underline \nu_{\kappa_0} +N $$
+  $$ \bar \nu_{\kappa_0} = \underline \nu_{\kappa_0} +\sum_{n=1}^{N}r_n $$
   Also,
   $$
   \begin{align*}
     & p(\kappa_+ | Y, X, B_+, B_0, \kappa_0) \propto p(B_+|\kappa_+, B_0, \kappa_0) p(\kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} )\\
-    & \propto \kappa_+^{-\frac{N}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \underline B) (\kappa_+ I_{K})^{-1} (B_{+n} - b_n V_n \underline B)'  \right\} \cdot \kappa_+^{-\frac{\underline \nu_{\kappa_+} + 2}{2}} \exp \left\{  -\frac{ \kappa_+}{2 \underline s_{\kappa_+}} \right\}\\
-    & = \kappa_+^{-\frac{\underline \nu_{\kappa_+} + N}{2} - 1} \cdot \exp \left\{  -\frac{1}{2} \left( (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' \cdot \frac{1}{\kappa_+} + \frac{1}{\underline s_{\kappa_+}} \kappa_+  \right) \right\}\\
+    & \propto \kappa_+^{-\frac{KN}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \underline B) (\kappa_+ I_{K})^{-1} (B_{+n} - b_n V_n \underline B)'  \right\} \cdot \kappa_+^{-\frac{\underline \nu_{\kappa_+} + 2}{2}} \exp \left\{  -\frac{ \kappa_+}{2 \underline s_{\kappa_+}} \right\}\\
+    & = \kappa_+^{-\frac{\underline \nu_{\kappa_+} + KN}{2} - 1} \cdot \exp \left\{  -\frac{1}{2} \left( (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' \cdot \frac{1}{\kappa_+} + \frac{1}{\underline s_{\kappa_+}} \kappa_+  \right) \right\}\\
   \end{align*}
   $$
   This gives
-  $$ \lambda = -\frac{\underline \nu_{\kappa_+} + N}{2} $$
+  $$ \lambda = -\frac{\underline \nu_{\kappa_+} + KN}{2} $$
   $$ \chi =  \sum_{n=1}^N  (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' $$
   $$  \Psi = \frac{1}{\underline s_{\kappa_+}} $$
   
