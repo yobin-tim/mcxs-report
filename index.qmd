@@ -30,6 +30,7 @@ The objective of this paper is to estimate and quantify the impact of monetary p
 This project website is being developed as a **Quarto** document and the empirical work in conducted using `R`. The necessary datasets are imported from the Reserve Bank of Australia (RBA) and the Australian Bureau of Statistics (ABS) websites using `readrba` and `readabs` respectively.
 
 ```{r load packages, include=FALSE}
+rm(list = ls())
 pkgs <- c('ggplot2', 'tidyr', 'dplyr', 'lubridate', 'readrba', 'readabs', 'tidyverse', "xts", "plotly", "rmarkdown", "zoo", "quantmod")
 # install.packages(pkgs)
 lapply(pkgs, library, character.only=TRUE)
@@ -58,7 +59,7 @@ I use the following variables to answer this question. I discuss the relevance o
 - $PPI$: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012.
 
 
-```{r download relevant variables, eval=FALSE}
+```{r download relevant variables, eval=FALSE, warning=FALSE}
 
 # M1 Money Supply; quarterly; billions; log
 m1.raw        <- read_rba_seriesid("DMAM1N")
@@ -106,19 +107,7 @@ homeprice.raw <- read_abs_series("A83728455L")
 homeprice.qtr <- to.quarterly(xts(homeprice.raw$value, homeprice.raw$date), OHLC = F)
 ```
 
-
-```{r : Step 0 - Load saved data, eval=TRUE, include=FALSE}
-  rm(list = ls())
-  load(file = "ProjectData.RData") # load saved empirical data if needed
-
-```
-
-## Data Properties
-The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behavior.
-
-
-The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q4, including 74 observations, plots of truncated dataset is shown as: 
-```{r : truncating data}
+```{r : truncating data; creating a dataframe, eval=FALSE}
 df <- as.data.frame(na.omit(cbind(m1.qtr,cashrate.qtr,usffr.qtr)))
 df                                      <- head(df,-1) # remove the last obs 
 colnames(df)                            <- c("M1 Money Supply (logs)","RBA Target Cash Rate","US FFR Max Target Rate")
@@ -131,7 +120,30 @@ df                                      <- head(df,-4) # drop the last 4 obs
 df["House Price Index"]                 <- NA 
 df[55:128,"House Price Index"]          <- as.numeric(homeprice.qtr)
 df                                      <- na.omit(df)
+df                                      <- df %>% select("Nominal GDP (log)", "Aggregate Consumption (log)",
+                                                         "% Change in CPI, yoy", "Quantity of new homes",
+                                                         "House Price Index", "Owner-occupied home loan rates",
+                                                         "M1 Money Supply (logs)", "US FFR Max Target Rate",
+                                                         "RBA Target Cash Rate")
 ```
+
+```{r : save loaded data, eval=FALSE}
+save.image(file="ProjectData.RData")
+```
+
+
+```{r : Step 0 - Load saved data, eval=TRUE, include=FALSE}
+  rm(list = ls())
+  load(file = "ProjectData.RData") # load saved empirical data if needed
+
+```
+
+## Data Properties
+The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behavior.
+
+
+The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q4, including 74 observations, plots of truncated dataset is shown as: 
+
 
 ```{r, echo=TRUE}
 var_names <- colnames(df)
@@ -146,29 +158,29 @@ for (j in 1:ncol(df)){
 
 ```
 
-```{r}
-library(plotly)
-var_names <- colnames(df)
-date_range <- as.yearqtr(rownames(df), format = "%Y Q%q")
-
-# Create an empty list to store plotly plots
-plots <- list()
-
-# Loop through each variable and create plotly plots
-for (j in 1:ncol(df)) {
-  p <- plot_ly() %>%
-    add_lines(x = date_range, y = df[, j], name = var_names[j]) %>%
-    layout(title = var_names[j], xaxis = list(title = ""), yaxis = list(title = ""), showlegend = FALSE)
-  plots[[j]] <- p
-}
-
-# Combine the plots into a single subplot
-subplot <- subplot(plotlist = plots, nrows = 3, margin = 0.1)
-
-# Display the interactive subplot
-subplot
-
-```
+# ```{r}
+# library(plotly)
+# var_names <- colnames(df)
+# date_range <- as.yearqtr(rownames(df), format = "%Y Q%q")
+# 
+# # Create an empty list to store plotly plots
+# plots <- list()
+# 
+# # Loop through each variable and create plotly plots
+# for (j in 1:ncol(df)) {
+#   p <- plot_ly() %>%
+#     add_lines(x = date_range, y = df[, j], name = var_names[j]) %>%
+#     layout(title = var_names[j], xaxis = list(title = ""), yaxis = list(title = ""), showlegend = FALSE)
+#   plots[[j]] <- p
+# }
+# 
+# # Combine the plots into a single subplot
+# subplot <- subplot(plotlist = plots, nrows = 3, margin = 0.1)
+# 
+# # Display the interactive subplot
+# subplot
+# 
+# ```
 
 ### ADF Tests
 Next, I perform and display ADF test results on the variables. I report, for each variable, the difference level at which the ADF tests rejects the null that the series is non-stationary. 
@@ -231,6 +243,8 @@ rmarkdown::paged_table(adf_test_results)
 ```
 ### ACF Plots
 ```{r : ACF, include=TRUE}
+#| label: ACF-Plots
+#| fig-cap: "ACF Plots for our data"
 par(mfrow = c(3,3), mar=c(2,2,2,2))
 for (j in 1:ncol(df)){
   acf(df[,j], xlab="")
@@ -240,6 +254,8 @@ for (j in 1:ncol(df)){
 ```
 ### PACF Plots
 ```{r : PACF, include=TRUE}
+#| label: PACF-Plots
+#| fig-cap: "PACF Plots for our data"
 par(mfrow = c(3,3), mar=c(2,2,2,2))
 for (j in 1:ncol(df)){
   pacf(df[,j], xlab="")
@@ -537,6 +553,8 @@ artificialdata  = list(p = sim.p, N = sim.N, K = sim.K, Y = sim.Y, X = sim.X)
 
 ```
 
+
+
 We obtain a list of simulation priors and posteriors. 
 ```{r : Step 2 - Compute priors and posteriors for simulated data, echo=TRUE}
 sim.priors      = prior(parameters, artificialdata)
@@ -632,6 +650,7 @@ load(file = "data-posteriors.RData")
 Bposterior.means = posteriorMeans(Bposteriors)
 data_B0 = pmatrix(Bposterior.means$B0)
 ```
+
 ```{r : Step 5b - Compute the posterior means of Bp for actual data, echo=TRUE, results='asis'}
 data_Bp = pmatrix(Bposterior.means$Bp)
 ```
@@ -656,7 +675,7 @@ ext.priors = function(parameters,usedata){
   kappap.s = .1,
   kappap.nu = 1,
   B       = cbind(rep(0,usedata$N), diag(usedata$N), matrix(0, usedata$N, (usedata$p-1)*usedata$N)), # random walk prior
-  Omega   = parameters$kappa1 * diag(usedata$K),
+  Omega   = parameters$kappa2 * diag(usedata$K),
   S       = parameters$kappa3*diag(usedata$N),
   nu      = usedata$N
 )
@@ -700,7 +719,7 @@ $$
     kappa0 = array(NA,c(1,S))
     kappa0[1] = 10
     kappap = rep(NA, S)
-    kappap[1] = 1
+    kappap[1] = 10
     B0.post = array(NA, c(usedata$N,usedata$N,S))
     Bp.post = array(NA, c(usedata$N,usedata$K,S))
     list(kappa0 = kappa0, kappap = kappap, B0.post = B0.post, Bp.post = Bp.post)
@@ -737,8 +756,8 @@ ext.sampling = function(parameters, struct, priors, usedata){
   struct$Bp.post[,,i] = Bp.i
   
   # Now, update kappa
-  kappa0.nu.post = priors$kappa0.nu + usedata$N
-  kappap.lambda.post = -(priors$kappap.nu + usedata$N)/2
+  kappa0.nu.post = priors$kappa0.nu + (usedata$N/2)
+  kappap.lambda.post = -(priors$kappap.nu + usedata$K * usedata$N)/2
   kappap.psi.post = 1/priors$kappap.s
   kappa0.s.post = priors$kappa0.s
   # kappap.chi.post = 0
@@ -753,26 +772,107 @@ ext.sampling = function(parameters, struct, priors, usedata){
     struct$kappap[i+1] = GIGrvg::rgig(n=1, kappap.lambda.post, kappap.chi.post, kappap.psi.post)
   }
   }
+  struct$kappa0 = struct$kappa0[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$kappap = struct$kappap[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$B0.post = struct$B0.post[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$Bp.post = struct$Bp.post[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
   return(struct)
   
 }
 
 ```
 
+```{r : function to compute struct posterior means, echo=TRUE}
+structPosteriorMeans = function(struct){
+  struct.means = list(
+  kappa0 = mean(struct$kappa0),
+  kappap = mean(struct$kappap),
+  B0 = rowMeans(struct$B0.post, dims = 2),
+  Bp = rowMeans(struct$Bp.post, dims = 2)
+  )
+}
+```
+
 The following code computes the prior, initialises matrices to store results, and samples the draws for the simulated data.
 ```{r : Running extension for simulated data, eval = FALSE, include=TRUE}
 ext.sim.prior = ext.priors(parameters, artificialdata)
 ext.sim.struct = init.struct(artificialdata, parameters$S + parameters$S.burnin)
-ext.sim.sample <- ext.sampling(parameters, ext.sim.struct, ext.sim.prior, artificialdata)
+ext.sim.struct <- ext.sampling(parameters, ext.sim.struct, ext.sim.prior, artificialdata)
 ```
+
+```{r : save simulation struct, eval=FALSE}
+save(ext.sim.struct, file = "ext.sim.struct.RData")
+```
+
+```{r : load simulation struct}
+load(file = "ext.sim.struct.RData")
+```
+
+```{r : compute the simulated struct posterior means for the data, echo=TRUE}
+ext.sim.struct.means = structPosteriorMeans(ext.sim.struct)
+```
+
+```{r : display in latex mode the simulated posterior means matrices, results='asis', echo=TRUE}
+ext.sim.data_B0 = pmatrix(ext.sim.struct.means$B0)
+```
+```{r, results='asis', echo=TRUE}
+ext.sim.data_Bp = pmatrix(ext.sim.struct.means$Bp)
+
+```
+
+```{r, results='asis', echo=TRUE}
+ext.sim.data_kappa0 = pmatrix(ext.sim.struct.means$kappa0)
+```
+
+```{r, results='asis', echo=TRUE}
+ext.sim.data_kappap = pmatrix(ext.sim.struct.means$kappap)
+
+```
+
+
 The following code computes the prior, initialises matrices to store results, and samples the draws for the actual data.
 ```{r : Running extension for actual data, eval = FALSE, include=TRUE}
 ext.prior = ext.priors(parameters, mydata)
 ext.struct = init.struct(mydata, parameters$S + parameters$S.burnin)
-ext.sample <- ext.sampling(parameters, ext.sim.struct, ext.sim.prior, mydata)
+ext.struct <- ext.sampling(parameters, ext.struct, ext.prior, mydata)
 ```
+
+```{r : save struct, eval=FALSE}
+save(ext.struct, file = "ext.struct.RData")
+```
+
+```{r : load struct}
+load(file = "ext.struct.RData")
+```
+
+
+
+
+```{r : compute the struct posterior means for the data, echo=TRUE}
+ext.struct.means = structPosteriorMeans(ext.struct)
+```
+
+```{r : display in latex mode the posterior means matrices, results='asis', echo=TRUE}
+ext.data_B0 = pmatrix(ext.struct.means$B0)
+
+```
+
+```{r, results='asis', echo=TRUE}
+ext.data_Bp = pmatrix(ext.struct.means$Bp)
+```
+
+```{r, results='asis', echo=TRUE}
+ext.data_kappa0 = pmatrix(ext.struct.means$kappa0)
+```
+
+```{r, results='asis', echo=TRUE}
+ext.data_kappap = pmatrix(ext.struct.means$kappap)
+```
+
 
 # Empirical Investigation
 
 
-## References {.unnumbered}
+# References {.unnumbered}
+
+# Appendix
