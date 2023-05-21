@@ -179,13 +179,12 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#empirical-project-setup" id="toc-empirical-project-setup" class="nav-link" data-scroll-target="#empirical-project-setup">Empirical Project Setup</a></li>
   <li><a href="#choice-of-variables" id="toc-choice-of-variables" class="nav-link" data-scroll-target="#choice-of-variables">Choice of variables</a></li>
-  <li><a href="#data-properties" id="toc-data-properties" class="nav-link" data-scroll-target="#data-properties">Data Properties</a></li>
-  </ul></li>
-  <li><a href="#r-libraryplotly-var_names---colnamesdf-date_range---as.yearqtrrownamesdf-format-y-qq-create-an-empty-list-to-store-plotly-plots-plots---list-loop-through-each-variable-and-create-plotly-plots-for-j-in-1ncoldf-p---plot_ly-add_linesx-date_range-y-df-j-name-var_namesj-layouttitle-var_namesj-xaxis-listtitle-yaxis-listtitle-showlegend-false-plotsj---p-combine-the-plots-into-a-single-subplot-subplot---subplotplotlist-plots-nrows-3-margin-0.1-display-the-interactive-subplot-subplot" id="toc-r-libraryplotly-var_names---colnamesdf-date_range---as.yearqtrrownamesdf-format-y-qq-create-an-empty-list-to-store-plotly-plots-plots---list-loop-through-each-variable-and-create-plotly-plots-for-j-in-1ncoldf-p---plot_ly-add_linesx-date_range-y-df-j-name-var_namesj-layouttitle-var_namesj-xaxis-listtitle-yaxis-listtitle-showlegend-false-plotsj---p-combine-the-plots-into-a-single-subplot-subplot---subplotplotlist-plots-nrows-3-margin-0.1-display-the-interactive-subplot-subplot" class="nav-link" data-scroll-target="#r-libraryplotly-var_names---colnamesdf-date_range---as.yearqtrrownamesdf-format-y-qq-create-an-empty-list-to-store-plotly-plots-plots---list-loop-through-each-variable-and-create-plotly-plots-for-j-in-1ncoldf-p---plot_ly-add_linesx-date_range-y-df-j-name-var_namesj-layouttitle-var_namesj-xaxis-listtitle-yaxis-listtitle-showlegend-false-plotsj---p-combine-the-plots-into-a-single-subplot-subplot---subplotplotlist-plots-nrows-3-margin-0.1-display-the-interactive-subplot-subplot"><code>{r} # library(plotly) # var_names &lt;- colnames(df) # date_range &lt;- as.yearqtr(rownames(df), format = "%Y Q%q") #  # # Create an empty list to store plotly plots # plots &lt;- list() #  # # Loop through each variable and create plotly plots # for (j in 1:ncol(df)) { #   p &lt;- plot_ly() %&gt;% #     add_lines(x = date_range, y = df[, j], name = var_names[j]) %&gt;% #     layout(title = var_names[j], xaxis = list(title = ""), yaxis = list(title = ""), showlegend = FALSE) #   plots[[j]] &lt;- p # } #  # # Combine the plots into a single subplot # subplot &lt;- subplot(plotlist = plots, nrows = 3, margin = 0.1) #  # # Display the interactive subplot # subplot #  #</code></a>
+  <li><a href="#data-properties" id="toc-data-properties" class="nav-link" data-scroll-target="#data-properties">Data Properties</a>
   <ul class="collapse">
   <li><a href="#adf-tests" id="toc-adf-tests" class="nav-link" data-scroll-target="#adf-tests">ADF Tests</a></li>
   <li><a href="#acf-plots" id="toc-acf-plots" class="nav-link" data-scroll-target="#acf-plots">ACF Plots</a></li>
   <li><a href="#pacf-plots" id="toc-pacf-plots" class="nav-link" data-scroll-target="#pacf-plots">PACF Plots</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#model-and-hypothesis" id="toc-model-and-hypothesis" class="nav-link" data-scroll-target="#model-and-hypothesis">Model and Hypothesis</a>
   <ul class="collapse">
@@ -201,8 +200,8 @@ div.csl-indent {
   <li><a href="#extended-model" id="toc-extended-model" class="nav-link" data-scroll-target="#extended-model">Extended Model</a></li>
   </ul></li>
   <li><a href="#empirical-investigation" id="toc-empirical-investigation" class="nav-link" data-scroll-target="#empirical-investigation">Empirical Investigation</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
 </nav>
@@ -296,10 +295,6 @@ div.csl-indent {
 <p><img src="index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</section>
-</section>
-<section id="r-libraryplotly-var_names---colnamesdf-date_range---as.yearqtrrownamesdf-format-y-qq-create-an-empty-list-to-store-plotly-plots-plots---list-loop-through-each-variable-and-create-plotly-plots-for-j-in-1ncoldf-p---plot_ly-add_linesx-date_range-y-df-j-name-var_namesj-layouttitle-var_namesj-xaxis-listtitle-yaxis-listtitle-showlegend-false-plotsj---p-combine-the-plots-into-a-single-subplot-subplot---subplotplotlist-plots-nrows-3-margin-0.1-display-the-interactive-subplot-subplot" class="level1">
-<h1><code>{r} # library(plotly) # var_names &lt;- colnames(df) # date_range &lt;- as.yearqtr(rownames(df), format = "%Y Q%q") #  # # Create an empty list to store plotly plots # plots &lt;- list() #  # # Loop through each variable and create plotly plots # for (j in 1:ncol(df)) { #   p &lt;- plot_ly() %&gt;% #     add_lines(x = date_range, y = df[, j], name = var_names[j]) %&gt;% #     layout(title = var_names[j], xaxis = list(title = ""), yaxis = list(title = ""), showlegend = FALSE) #   plots[[j]] &lt;- p # } #  # # Combine the plots into a single subplot # subplot &lt;- subplot(plotlist = plots, nrows = 3, margin = 0.1) #  # # Display the interactive subplot # subplot #  #</code></h1>
 <section id="adf-tests" class="level3">
 <h3 class="anchored" data-anchor-id="adf-tests">ADF Tests</h3>
 <p>Next, I perform and display ADF test results on the variables. I report, for each variable, the difference level at which the ADF tests rejects the null that the series is non-stationary.</p>
@@ -381,7 +376,7 @@ div.csl-indent {
 </section>
 <section id="pacf-plots" class="level3">
 <h3 class="anchored" data-anchor-id="pacf-plots">PACF Plots</h3>
-<div class="cell">
+<div class="cell fig-cap-location-top">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -391,6 +386,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
+</section>
 </section>
 </section>
 <section id="model-and-hypothesis" class="level1">
@@ -968,17 +964,17 @@ x\\
 <section id="empirical-investigation" class="level1">
 <h1>Empirical Investigation</h1>
 </section>
-<section id="references" class="level1 unnumbered">
-<h1 class="unnumbered">References</h1>
-</section>
 <section id="appendix" class="level1">
+<h1>Appendix</h1>
+</section>
+<section id="references" class="level1 unnumbered">
 
 
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Appendix</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-AK_2017" class="csl-entry" role="doc-biblioentry">
 Aliber, Robert Z., and Charles P. Kindleberger. 2017. <em>Manias, Panics, and Crashes: A History of Financial Crises, Seventh Edition</em>. Springer.
 </div>

@@ -158,29 +158,6 @@ for (j in 1:ncol(df)){
 
 ```
 
-# ```{r}
-# library(plotly)
-# var_names <- colnames(df)
-# date_range <- as.yearqtr(rownames(df), format = "%Y Q%q")
-# 
-# # Create an empty list to store plotly plots
-# plots <- list()
-# 
-# # Loop through each variable and create plotly plots
-# for (j in 1:ncol(df)) {
-#   p <- plot_ly() %>%
-#     add_lines(x = date_range, y = df[, j], name = var_names[j]) %>%
-#     layout(title = var_names[j], xaxis = list(title = ""), yaxis = list(title = ""), showlegend = FALSE)
-#   plots[[j]] <- p
-# }
-# 
-# # Combine the plots into a single subplot
-# subplot <- subplot(plotlist = plots, nrows = 3, margin = 0.1)
-# 
-# # Display the interactive subplot
-# subplot
-# 
-# ```
 
 ### ADF Tests
 Next, I perform and display ADF test results on the variables. I report, for each variable, the difference level at which the ADF tests rejects the null that the series is non-stationary. 
@@ -255,6 +232,7 @@ for (j in 1:ncol(df)){
 ### PACF Plots
 ```{r : PACF, include=TRUE}
 #| label: PACF-Plots
+#| fig-cap-location: top
 #| fig-cap: "PACF Plots for our data"
 par(mfrow = c(3,3), mar=c(2,2,2,2))
 for (j in 1:ncol(df)){
@@ -873,6 +851,9 @@ ext.data_kappap = pmatrix(ext.struct.means$kappap)
 # Empirical Investigation
 
 
+# Appendix
+
 # References {.unnumbered}
 
-# Appendix
+
+
