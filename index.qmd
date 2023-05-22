@@ -121,11 +121,16 @@ df["House Price Index"]                 <- NA
 df[55:128,"House Price Index"]          <- as.numeric(homeprice.qtr)
 df                                      <- na.omit(df)
 df                                      <- df %>% select("Nominal GDP (log)", "Aggregate Consumption (log)",
-                                                         "% Change in CPI, yoy", "Quantity of new homes",
+                                                         "% Change in CPI, yoy", "US FFR Max Target Rate", "Quantity of new homes",
                                                          "House Price Index", "Owner-occupied home loan rates",
-                                                         "M1 Money Supply (logs)", "US FFR Max Target Rate",
+                                                         "M1 Money Supply (logs)", ,
                                                          "RBA Target Cash Rate")
 ```
+
+```{r , eval=TRUE}
+head(df)
+```
+
 
 ```{r : save loaded data, eval=FALSE}
 save.image(file="ProjectData.RData")
@@ -381,7 +386,7 @@ parameters = list(
   kappa4    = 1,       # VAR prior persistence
   S         = 5000,
   S.burnin  = 100,
-  h         = 6        # forecast horizon
+  h         = 8        # forecast horizon
 )
 ```
 
@@ -504,6 +509,22 @@ posteriorMeans = function(Bposteriors){
 }
 ```
 
+
+```{r : function to print matrix in latex format, results='asis'}
+pmatrix <- function(x) {
+  cat(c("$$\\begin{equation*}\n",
+    "\\left(",
+    knitr::kable(x, format = "latex", 
+                 tabular = "array",
+                 vline = "",
+                 align = "c",
+                 linesep = "",
+                 toprule = NULL,
+                 bottomrule = NULL),
+    "\n\\right)\\, .\n",
+    "\\end{equation*}$$\n"))
+}
+```
 ### Simulation Run
 
 The following code generates artificial data containing 1000 observations from a bi-variate Gaussian random walk process with the covariance matrix equal to the identity matrix of order 2.
@@ -553,22 +574,6 @@ save(sim.Bposteriors, sim.priors, sim.posteriors, file = "sim-posteriors.RData")
 
 ```{r : Step 4b - load saved simulated posteriors, eval=TRUE}
 load(file = "sim-posteriors.RData")
-```
-
-```{r : function to print matrix in latex format, results='asis'}
-pmatrix <- function(x) {
-  cat(c("$$\\begin{equation*}\n",
-    "\\left(",
-    knitr::kable(x, format = "latex", 
-                 tabular = "array",
-                 vline = "",
-                 align = "c",
-                 linesep = "",
-                 toprule = NULL,
-                 bottomrule = NULL),
-    "\n\\right)\\, .\n",
-    "\\end{equation*}$$\n"))
-}
 ```
 
 
@@ -707,6 +712,7 @@ The sampling function is given below.
 
 ```{r : Sampling, echo=TRUE}
 ext.sampling = function(parameters, struct, priors, usedata){
+  set.seed(12345)
   B0Vlist.initial = ltexclusion(usedata)
   B0.initial = B0Vlist.initial$B0
   for (i in 1:(parameters$S + parameters$S.burnin)){
@@ -848,6 +854,7 @@ ext.data_kappap = pmatrix(ext.struct.means$kappap)
 
 # Empirical Investigation
 
+## Impulse Response Functions (IRFs)
 ```{r}
 irf_fevd = function(parameters, usedata, Bposteriors){
   N = usedata$N
@@ -900,9 +907,9 @@ data.irf_fevd = irf_fevd(parameters, mydata, Bposteriors)
 ```
 
 ```{r : Plotting the effects of the AU CR shock}
-plot_irf = function(position){
+plot_irf = function(position, fevd, parameters){
   # Unpack results
-IRF.posterior = data.irf_fevd$IRF.posterior
+IRF.posterior = fevd$IRF.posterior
 
 IRF.posterior.mps = IRF.posterior[,position,,]
 IRFs.k1           = apply(IRF.posterior.mps,1:2,median)
@@ -936,7 +943,7 @@ for (n in 1:N){
   ylims     = range(IRFs.k1[n,hh],IRFs.k1.hdi[,n,1:4],0)
   p1 <- plot(hh,IRFs.k1[n,hh], type="l", ylim=ylims, axes=FALSE, xlab="", main=rownames(IRFs.k1)[n])
   # if (n==5 | n==6){
-    axis(1,c(1,2,5,7),c("","1 quarter","1 year","6 quarters"))
+    axis(1,c(1,2,5,7,9),c("","1 quarter","1 year","6 quarters", "2 years"))
   # } else {
   #   axis(1,c(1,2,5,7),c("","","",""))
   # }
@@ -954,16 +961,73 @@ return(list(p1))
 #| label: cashrate.irf
 #| fig-cap: "IRF plots for the AU Cash Rate Shock"
 #| fig-cap-location: top
-cashrate.irf = plot_irf(9)
+cashrate.irf = plot_irf(9, data.irf_fevd, parameters)
 ```
 
 ```{r}
 #| label: usffr.irf
 #| fig-cap: "IRF plots for the US Federal Funds Rate Shock"
 #| fig-cap-location: top
-usffr.irf = plot_irf(8)
+usffr.irf = plot_irf(4, data.irf_fevd, parameters)
 ```
 
+## Forecast Error Variance Decomposition
+
+```{r}
+plot_fevd = function(position, fevd, parameters){
+  FEVD.posterior = fevd$FEVD.posterior
+  h = parameters$h
+  N = dim(FEVD.posterior)[1]
+  ffr.pos = which(colnames(df) == "US FFR Max Target Rate")
+  cr.pos = which(colnames(df) == "RBA Target Cash Rate")
+  
+  hh            = 1:(h+1)
+fevd.mat  = apply(FEVD.posterior[position,,,],1:2,mean)
+fevd.mat  = rbind(rep(0,h+1),apply(fevd.mat,2,cumsum))
+
+colors = c("deepskyblue1","deepskyblue2","deepskyblue","deepskyblue3","deepskyblue4","dodgerblue",
+           "maroon1","maroon","maroon2","magenta","maroon3","maroon4")
+
+par(mar=rep(4,4),cex.axis=1, cex.lab=0.8)
+p1 <- plot(hh,fevd.mat[1,], type="n", ylim=c(0,100), axes=FALSE, xlab="", ylab="")
+axis(1,hh,c("","1 quarter","","","1 year","","","","2 years"))
+axis(2,c(0,50,100),c("",colnames(df)[position],""))
+for (n in 1:N){
+  polygon(c(hh,(h+1):1), c(fevd.mat[n,hh],fevd.mat[n+1,(h+1):1]), col=colors[n],border=colors[n])
+}
+axis(4, (0.5*(fevd.mat[(1:N),(h+1)]+fevd.mat[2:(N+1),(h+1)]))[c(ffr.pos,position,cr.pos)], c("us.mps","","au.mps")) # fix position of terms
+return(list(p1))
+}
+```
+
+```{r}
+variable.choice = "Nominal GDP (log)"
+position = which(colnames(df) == variable.choice)
+gdp.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
+```{r}
+variable.choice = "Aggregate Consumption (log)"
+position = which(colnames(df) == variable.choice)
+con.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+```{r}
+variable.choice = "% Change in CPI, yoy"
+position = which(colnames(df) == variable.choice)
+cpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
+```{r}
+variable.choice = "House Price Index"
+position = which(colnames(df) == variable.choice)
+hpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
+```{r}
+variable.choice = "M1 Money Supply (logs)"
+position = which(colnames(df) == variable.choice)
+m1.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
 
 # Appendix
 
