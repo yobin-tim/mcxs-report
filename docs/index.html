@@ -492,8 +492,9 @@ div.csl-indent {
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">kappa3    =</span> <span class="dv">10</span>,      <span class="co"># contemporaneous effects shrinkage</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">kappa4    =</span> <span class="dv">1</span>,       <span class="co"># VAR prior persistence</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">S         =</span> <span class="dv">5000</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">S.burnin  =</span> <span class="dv">100</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">S.burnin  =</span> <span class="dv">100</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">h         =</span> <span class="dv">6</span>        <span class="co"># forecast horizon</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We also calibrate the number of draws <span class="math inline">\(S = 5000\)</span> for any sampling, while the <span class="math inline">\(S.burnin = 100\)</span> represents the number of draws that are sampled first and then discarded.</p>
 </section>
@@ -963,6 +964,35 @@ x\\
 </section>
 <section id="empirical-investigation" class="level1">
 <h1>Empirical Investigation</h1>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell fig-cap-location-top">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cashrate.irf-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">IRF plots for the AU Cash Rate Shock</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell fig-cap-location-top">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/usffr.irf-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">IRF plots for the US Federal Funds Rate Shock</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="appendix" class="level1">
 <h1>Appendix</h1>

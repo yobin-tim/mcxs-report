@@ -31,7 +31,7 @@ This project website is being developed as a **Quarto** document and the empiric
 
 ```{r load packages, include=FALSE}
 rm(list = ls())
-pkgs <- c('ggplot2', 'tidyr', 'dplyr', 'lubridate', 'readrba', 'readabs', 'tidyverse', "xts", "plotly", "rmarkdown", "zoo", "quantmod")
+pkgs <- c('ggplot2', 'tidyr', 'dplyr', 'lubridate', 'readrba', 'readabs', 'tidyverse', "xts", "plotly", "rmarkdown", "zoo", "quantmod", "HDInterval", "plot3D", "mvtnorm")
 # install.packages(pkgs)
 lapply(pkgs, library, character.only=TRUE)
 ```
@@ -133,9 +133,7 @@ save.image(file="ProjectData.RData")
 
 
 ```{r : Step 0 - Load saved data, eval=TRUE, include=FALSE}
-  rm(list = ls())
   load(file = "ProjectData.RData") # load saved empirical data if needed
-
 ```
 
 ## Data Properties
@@ -382,7 +380,8 @@ parameters = list(
   kappa3    = 10,      # contemporaneous effects shrinkage
   kappa4    = 1,       # VAR prior persistence
   S         = 5000,
-  S.burnin  = 100
+  S.burnin  = 100,
+  h         = 6        # forecast horizon
 )
 ```
 
@@ -847,8 +846,123 @@ ext.data_kappa0 = pmatrix(ext.struct.means$kappa0)
 ext.data_kappap = pmatrix(ext.struct.means$kappap)
 ```
 
-
 # Empirical Investigation
+
+```{r}
+irf_fevd = function(parameters, usedata, Bposteriors){
+  N = usedata$N
+  K = usedata$K
+  p = usedata$p
+  S = parameters$S
+  h = parameters$h
+  B0.posterior = Bposteriors$B0.posterior
+  Bp.posterior = Bposteriors$Bp.posterior
+  
+  B.posterior       = array(NA,c(N,N,S))
+A.posterior       = array(NA,c(N,K,S))
+for (s in 1:S){
+  B               = solve(B0.posterior[,,s])
+  B.posterior[,,s]= B
+  A.posterior[,,s]= B %*% Bp.posterior[,,s]
+}
+
+IRF.posterior     = array(NA,c(N,N,h+1,S))
+IRF.inf.posterior = array(NA,c(N,N,S))
+FEVD.posterior    = array(NA,c(N,N,h+1,S))
+J                 = cbind(diag(N),matrix(0,N,N*(p-1)))
+for (s in 1:S){
+  A.bold          = rbind(A.posterior[,2:(1+N*p),s],cbind(diag(N*(p-1)),matrix(0,N*(p-1),N)))
+  IRF.inf.posterior[,,s]          = J %*% solve(diag(N*p)-A.bold) %*% t(J) %*% B.posterior[,,s]
+  A.bold.power    = A.bold
+  for (i in 1:(h+1)){
+    if (i==1){
+      IRF.posterior[,,i,s]        = B.posterior[,,s]
+    } else {
+      IRF.posterior[,,i,s]        = J %*% A.bold.power %*% t(J) %*% IRF.posterior[,,i-1,s]
+      A.bold.power                = A.bold.power %*% A.bold
+    }
+    for (n in 1:N){
+      for (nn in 1:N){
+        FEVD.posterior[n,nn,i,s]  = sum(IRF.posterior[n,nn,1:i,s]^2)
+      }
+    }
+    FEVD.posterior[,,i,s]         = diag(1/apply(FEVD.posterior[,,i,s],1,sum))%*%FEVD.posterior[,,i,s]
+  }
+}
+FEVD.posterior    = 100*FEVD.posterior
+
+list(IRF.posterior = IRF.posterior, IRF.inf.posterior= IRF.inf.posterior, FEVD.posterior = FEVD.posterior)
+}
+```
+
+```{r}
+data.irf_fevd = irf_fevd(parameters, mydata, Bposteriors)
+```
+
+```{r : Plotting the effects of the AU CR shock}
+plot_irf = function(position){
+  # Unpack results
+IRF.posterior = data.irf_fevd$IRF.posterior
+
+IRF.posterior.mps = IRF.posterior[,position,,]
+IRFs.k1           = apply(IRF.posterior.mps,1:2,median)
+IRF.posterior.mps = IRF.posterior.mps*(0.25/IRFs.k1[position,1])
+IRFs.k1           = apply(IRF.posterior.mps,1:2,median)
+IRFs.inf.k1       = apply(IRF.posterior.mps,1,mean)
+var_names         = colnames(df)
+rownames(IRFs.k1) = var_names
+
+IRFs.k1.hdi       = apply(IRF.posterior.mps,1:2, hdi, credMass=0.68)
+h                 = parameters$h
+hh                = 1:(h+1)
+
+# Define colors
+mcxs1  = "#05386B"
+mcxs2  = "#379683"
+mcxs3  = "#5CDB95"
+mcxs4  = "#8EE4AF"
+mcxs5  = "#EDF5E1"
+purple = "#b02442"
+
+mcxs1.rgb   = col2rgb(mcxs1)
+mcxs1.shade1= rgb(mcxs1.rgb[1],mcxs1.rgb[2],mcxs1.rgb[3], alpha=120, maxColorValue=255)
+mcxs2.rgb   = col2rgb(mcxs2)
+mcxs2.shade1= rgb(mcxs2.rgb[1],mcxs2.rgb[2],mcxs2.rgb[3], alpha=120, maxColorValue=255)
+
+# Save as pdf
+# pdf(file="FF-irf-mps.pdf", height=9, width=12)
+par(mfrow=c(3,3), mar=c(2,2,2,2))
+for (n in 1:N){
+  ylims     = range(IRFs.k1[n,hh],IRFs.k1.hdi[,n,1:4],0)
+  p1 <- plot(hh,IRFs.k1[n,hh], type="l", ylim=ylims, axes=FALSE, xlab="", main=rownames(IRFs.k1)[n])
+  # if (n==5 | n==6){
+    axis(1,c(1,2,5,7),c("","1 quarter","1 year","6 quarters"))
+  # } else {
+  #   axis(1,c(1,2,5,7),c("","","",""))
+  # }
+  axis(2,c(ylims[1],0,ylims[2]),round(c(ylims[1],0,ylims[2]),3))
+  polygon(c(hh,(h+1):1), c(IRFs.k1.hdi[1,n,hh],IRFs.k1.hdi[2,n,(h+1):1]), col=mcxs1.shade1,border=mcxs1.shade1)
+  abline(h=0)
+  lines(hh, IRFs.k1[n,hh],lwd=2,col=mcxs1)
+}
+# dev.off()
+return(list(p1))
+}
+```
+
+```{r}
+#| label: cashrate.irf
+#| fig-cap: "IRF plots for the AU Cash Rate Shock"
+#| fig-cap-location: top
+cashrate.irf = plot_irf(9)
+```
+
+```{r}
+#| label: usffr.irf
+#| fig-cap: "IRF plots for the US Federal Funds Rate Shock"
+#| fig-cap-location: top
+usffr.irf = plot_irf(8)
+```
 
 
 # Appendix
