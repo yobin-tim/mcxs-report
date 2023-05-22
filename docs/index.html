@@ -310,6 +310,9 @@ div.csl-indent {
 <p><img src="index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<div class="cell">
+
+</div>
 <section id="adf-tests" class="level3">
 <h3 class="anchored" data-anchor-id="adf-tests">ADF Tests</h3>
 <p>Next, I perform and display ADF test results on the variables. I report, for each variable, the difference level at which the ADF tests rejects the null that the series is non-stationary.</p>
@@ -370,7 +373,7 @@ div.csl-indent {
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Variable"],"name":[1],"type":["chr"],"align":["left"]},{"label":["TestType"],"name":[2],"type":["chr"],"align":["left"]},{"label":["TestStatistic"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["PValue"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Nominal GDP (log)","2":"Second Difference","3":"-6.191919","4":"0.01000000","_rn_":"Dickey-Fuller...1"},{"1":"Aggregate Consumption (log)","2":"First Difference","3":"-3.563888","4":"0.04262641","_rn_":"Dickey-Fuller...2"},{"1":"% Change in CPI, yoy","2":"First Difference","3":"-3.888444","4":"0.01961894","_rn_":"Dickey-Fuller...3"},{"1":"Quantity of new homes","2":"First Difference","3":"-3.854630","4":"0.02114484","_rn_":"Dickey-Fuller...4"},{"1":"House Price Index","2":"Second Difference","3":"-5.350314","4":"0.01000000","_rn_":"Dickey-Fuller...5"},{"1":"Owner-occupied home loan rates","2":"First Difference","3":"-4.099249","4":"0.01010607","_rn_":"Dickey-Fuller...6"},{"1":"M1 Money Supply (logs)","2":"First Difference","3":"-3.648050","4":"0.03540095","_rn_":"Dickey-Fuller...7"},{"1":"US FFR Max Target Rate","2":"Second Difference","3":"-4.029469","4":"0.01334623","_rn_":"Dickey-Fuller...8"},{"1":"RBA Target Cash Rate","2":"First Difference","3":"-4.021322","4":"0.01362264","_rn_":"Dickey-Fuller...9"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Variable"],"name":[1],"type":["chr"],"align":["left"]},{"label":["TestType"],"name":[2],"type":["chr"],"align":["left"]},{"label":["TestStatistic"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["PValue"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Nominal GDP (log)","2":"Second Difference","3":"-6.191919","4":"0.01000000","_rn_":"Dickey-Fuller...1"},{"1":"Aggregate Consumption (log)","2":"First Difference","3":"-3.563888","4":"0.04262641","_rn_":"Dickey-Fuller...2"},{"1":"% Change in CPI, yoy","2":"First Difference","3":"-3.888444","4":"0.01961894","_rn_":"Dickey-Fuller...3"},{"1":"US FFR Max Target Rate","2":"Second Difference","3":"-4.029469","4":"0.01334623","_rn_":"Dickey-Fuller...4"},{"1":"Quantity of new homes","2":"First Difference","3":"-3.854630","4":"0.02114484","_rn_":"Dickey-Fuller...5"},{"1":"House Price Index","2":"Second Difference","3":"-5.350314","4":"0.01000000","_rn_":"Dickey-Fuller...6"},{"1":"Owner-occupied home loan rates","2":"First Difference","3":"-4.099249","4":"0.01010607","_rn_":"Dickey-Fuller...7"},{"1":"RBA Target Cash Rate","2":"First Difference","3":"-4.021322","4":"0.01362264","_rn_":"Dickey-Fuller...8"},{"1":"M1 Money Supply (logs)","2":"First Difference","3":"-3.648050","4":"0.03540095","_rn_":"Dickey-Fuller...9"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -388,6 +391,9 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<div class="cell">
+
+</div>
 </section>
 <section id="pacf-plots" class="level3">
 <h3 class="anchored" data-anchor-id="pacf-plots">PACF Plots</h3>
@@ -400,6 +406,9 @@ div.csl-indent {
 </figure>
 </div>
 </div>
+</div>
+<div class="cell">
+
 </div>
 </section>
 </section>
@@ -508,7 +517,7 @@ div.csl-indent {
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">kappa4    =</span> <span class="dv">1</span>,       <span class="co"># VAR prior persistence</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">S         =</span> <span class="dv">5000</span>,</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">S.burnin  =</span> <span class="dv">100</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">h         =</span> <span class="dv">8</span>        <span class="co"># forecast horizon</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">h         =</span> <span class="dv">16</span>        <span class="co"># forecast horizon</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We also calibrate the number of draws <span class="math inline">\(S = 5000\)</span> for any sampling, while the <span class="math inline">\(S.burnin = 100\)</span> represents the number of draws that are sampled first and then discarded.</p>
@@ -715,15 +724,15 @@ div.csl-indent {
 <p><span class="math display">\[\begin{equation*}
 \left(
 \begin{array}{ccccccccc}
-26.4940518 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--0.3380425 &amp; 24.6273230 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--1.2296512 &amp; -0.9983330 &amp; 1.6722032 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--0.1233031 &amp; -2.4537432 &amp; -0.2632202 &amp; 19.6985309 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
-2.1051513 &amp; -5.0613220 &amp; -0.4257930 &amp; -0.7689391 &amp; 0.6126037 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--0.2150772 &amp; -1.2957925 &amp; -0.3869991 &amp; -1.7047604 &amp; 0.0374219 &amp; 3.4011970 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
-1.0154503 &amp; 1.5283911 &amp; 0.1711357 &amp; -0.3195497 &amp; -0.1116862 &amp; 0.2279021 &amp; 23.613955 &amp; 0.000000 &amp; 0.000000\\
--0.4246873 &amp; -0.4641174 &amp; -0.4620483 &amp; 1.6636036 &amp; 0.0280645 &amp; 0.1028981 &amp; 2.499467 &amp; 2.957524 &amp; 0.000000\\
--0.8187946 &amp; -0.2578413 &amp; -0.1325210 &amp; -1.0640772 &amp; 0.0538243 &amp; -0.6299644 &amp; 4.258376 &amp; -1.312915 &amp; 4.285367\\
+26.4940506 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.00000\\
+0.8517774 &amp; 24.4846669 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.00000\\
+0.6252281 &amp; -1.2165965 &amp; 1.6661345 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.00000\\
+0.1379359 &amp; -0.1336934 &amp; -0.4166088 &amp; 2.9181337 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.00000\\
+0.0076390 &amp; -2.4282350 &amp; -0.3041839 &amp; 0.2508197 &amp; 19.7905815 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.00000\\
+-2.3779812 &amp; -4.7369472 &amp; -0.4451232 &amp; 0.1765721 &amp; -0.5412838 &amp; 0.6252274 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.00000\\
+0.1696335 &amp; -1.3443002 &amp; -0.3955862 &amp; 0.0578794 &amp; -1.6714041 &amp; 0.0373360 &amp; 3.3962787 &amp; 0.0000000 &amp; 0.00000\\
+0.9184029 &amp; -0.7761973 &amp; -0.1500052 &amp; -1.3481075 &amp; -1.1455669 &amp; 0.0680451 &amp; -0.6531091 &amp; 4.2071589 &amp; 0.00000\\
+-0.8836102 &amp; 1.4644154 &amp; 0.0999161 &amp; 0.0598676 &amp; -0.1893197 &amp; -0.0944289 &amp; 0.1101804 &amp; 0.7711798 &amp; 24.08845\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -731,15 +740,15 @@ div.csl-indent {
 <p><span class="math display">\[\begin{equation*}
 \left(
 \begin{array}{ccccccccccccccccccccccccccccccccccccc}
-0.0313870 &amp; 26.4569415 &amp; -0.0327681 &amp; 0.1819720 &amp; 0.0568686 &amp; -0.0033431 &amp; 0.0813427 &amp; 0.0247433 &amp; 0.0665232 &amp; 0.0271708 &amp; -0.0096913 &amp; -0.0105761 &amp; -0.0997355 &amp; 0.0070901 &amp; -0.0206845 &amp; -0.0016423 &amp; 0.0065069 &amp; -0.0372623 &amp; -0.0138630 &amp; -0.0024978 &amp; -0.0034855 &amp; -0.0098862 &amp; 0.0026398 &amp; 0.0291279 &amp; -0.0112187 &amp; -0.0003108 &amp; -0.0098788 &amp; -0.0187000 &amp; -0.0009047 &amp; -0.0020087 &amp; -0.0139349 &amp; 0.0006616 &amp; -0.0040534 &amp; -0.0138101 &amp; 0.0026386 &amp; -0.0037407 &amp; -0.0121108\\
-0.3118403 &amp; -0.3491077 &amp; 24.5944735 &amp; 0.1658414 &amp; 0.0323675 &amp; -0.0290125 &amp; 0.0056105 &amp; 0.0415607 &amp; 0.0906851 &amp; -0.0069232 &amp; -0.0035971 &amp; 0.0001838 &amp; -0.1478081 &amp; 0.0035363 &amp; 0.0108540 &amp; -0.0142010 &amp; 0.0092315 &amp; -0.0701845 &amp; -0.0171378 &amp; 0.0015312 &amp; 0.0007600 &amp; 0.0347196 &amp; 0.0029587 &amp; 0.0386143 &amp; -0.0072547 &amp; 0.0033597 &amp; -0.0175452 &amp; 0.0032212 &amp; 0.0015009 &amp; -0.0000570 &amp; 0.0105633 &amp; -0.0001803 &amp; -0.0233427 &amp; 0.0006515 &amp; 0.0048423 &amp; -0.0107779 &amp; 0.0014931\\
-0.1177781 &amp; -1.2767720 &amp; -1.0518524 &amp; 1.2094425 &amp; 0.0761097 &amp; 0.1008272 &amp; 0.3125345 &amp; 0.0568971 &amp; 0.0034985 &amp; 0.0131132 &amp; -0.0147020 &amp; -0.0162680 &amp; -0.1390088 &amp; 0.0155970 &amp; -0.0683094 &amp; -0.0071123 &amp; 0.0109398 &amp; 0.0529946 &amp; -0.0419230 &amp; -0.0062477 &amp; -0.0088432 &amp; -0.0476680 &amp; 0.0108559 &amp; -0.0393847 &amp; -0.0277866 &amp; 0.0070099 &amp; -0.0224318 &amp; -0.0063652 &amp; -0.0050057 &amp; 0.0001287 &amp; -0.0595951 &amp; 0.0014401 &amp; 0.0056259 &amp; -0.0047971 &amp; 0.0029218 &amp; -0.0094402 &amp; 0.0033100\\
-2.0868301 &amp; 0.0268110 &amp; -2.3415207 &amp; -0.5485285 &amp; 19.6611083 &amp; -0.0442322 &amp; -0.0845858 &amp; 0.2310404 &amp; -0.0813849 &amp; -0.3370252 &amp; 0.0433237 &amp; 0.0237512 &amp; -0.1349206 &amp; -0.0462332 &amp; 0.0116183 &amp; -0.0349516 &amp; 0.0524911 &amp; 0.0241447 &amp; -0.0193755 &amp; 0.0197654 &amp; 0.0125298 &amp; 0.0119089 &amp; -0.0192205 &amp; 0.0006222 &amp; 0.0127275 &amp; 0.0204818 &amp; 0.0608027 &amp; 0.0373901 &amp; 0.0140173 &amp; 0.0128423 &amp; 0.0298812 &amp; -0.0061018 &amp; -0.0028882 &amp; 0.0337124 &amp; 0.0078184 &amp; 0.0535644 &amp; 0.0537298\\
-1.1897387 &amp; 2.2106340 &amp; -5.0088842 &amp; -0.1006487 &amp; -0.6205730 &amp; 0.9293977 &amp; -0.3167683 &amp; 0.2770154 &amp; 0.0190907 &amp; -0.2095057 &amp; 0.0295785 &amp; 0.0099102 &amp; -0.1273959 &amp; 0.0251088 &amp; -0.2841019 &amp; -0.0102570 &amp; 0.0720094 &amp; -0.0294874 &amp; -0.0196386 &amp; 0.0094809 &amp; 0.0039184 &amp; -0.0200953 &amp; 0.0048169 &amp; -0.1268620 &amp; 0.0221273 &amp; 0.0260895 &amp; 0.0231599 &amp; 0.0156990 &amp; 0.0058236 &amp; 0.0014680 &amp; 0.0285972 &amp; -0.0003972 &amp; 0.0682792 &amp; 0.0227194 &amp; 0.0194514 &amp; 0.0277990 &amp; -0.0022622\\
-2.7099515 &amp; -0.1194878 &amp; -1.1686990 &amp; -0.5450012 &amp; -1.6039826 &amp; 0.1280864 &amp; 3.3777491 &amp; 0.0043075 &amp; 0.2080657 &amp; -0.1297811 &amp; 0.0257322 &amp; 0.0273878 &amp; -0.1050657 &amp; 0.0153163 &amp; -0.0464076 &amp; -0.0742932 &amp; 0.0086350 &amp; 0.0901584 &amp; -0.0865690 &amp; 0.0136484 &amp; 0.0147759 &amp; -0.0439244 &amp; 0.0099363 &amp; -0.0665364 &amp; -0.0511785 &amp; 0.0017058 &amp; -0.0831901 &amp; -0.0057465 &amp; 0.0042236 &amp; 0.0067384 &amp; 0.0317697 &amp; 0.0067574 &amp; -0.0063785 &amp; 0.0016346 &amp; 0.0020328 &amp; -0.0565111 &amp; 0.0148611\\
-0.3805479 &amp; 1.0797164 &amp; 1.5590079 &amp; 0.0977334 &amp; -0.3803556 &amp; -0.1717108 &amp; 0.0276471 &amp; 23.6592986 &amp; 0.0333069 &amp; 0.0626810 &amp; 0.0147699 &amp; 0.0101397 &amp; 0.0276574 &amp; -0.0074707 &amp; 0.0799705 &amp; 0.0524361 &amp; 0.0169888 &amp; 0.0156272 &amp; -0.0238062 &amp; 0.0061966 &amp; 0.0030899 &amp; 0.0070784 &amp; 0.0020508 &amp; -0.0237472 &amp; 0.0043300 &amp; 0.0055746 &amp; 0.0267517 &amp; -0.0003354 &amp; 0.0009739 &amp; 0.0023843 &amp; -0.0005320 &amp; 0.0007199 &amp; 0.0023859 &amp; 0.0078429 &amp; 0.0041326 &amp; 0.0255033 &amp; -0.0155662\\
-4.2115891 &amp; -0.3653257 &amp; -0.3237969 &amp; -0.4357207 &amp; 1.8592501 &amp; -0.1032033 &amp; 0.1499585 &amp; 2.5088269 &amp; 3.1525256 &amp; -0.3110547 &amp; 0.0101621 &amp; 0.0273494 &amp; 0.0283019 &amp; 0.0557167 &amp; 0.1173075 &amp; -0.1323711 &amp; 0.0077811 &amp; -0.0777921 &amp; -0.0529169 &amp; 0.0041631 &amp; 0.0140670 &amp; 0.0557519 &amp; 0.0267265 &amp; 0.0085934 &amp; -0.0411494 &amp; 0.0068860 &amp; -0.0935479 &amp; -0.0289034 &amp; 0.0000931 &amp; 0.0052338 &amp; -0.0055452 &amp; 0.0152012 &amp; -0.0315718 &amp; -0.0246428 &amp; 0.0040602 &amp; -0.1188626 &amp; -0.0266781\\
--0.8375270 &amp; -0.8518276 &amp; -0.2703360 &amp; -0.0307538 &amp; -1.0175083 &amp; 0.1413908 &amp; 0.5599471 &amp; 4.2092707 &amp; -1.1793020 &amp; 3.7460968 &amp; -0.0043574 &amp; -0.0070958 &amp; -0.1730547 &amp; -0.0072167 &amp; -0.0199354 &amp; -0.1521636 &amp; -0.0083810 &amp; 0.0483988 &amp; -0.1605946 &amp; -0.0001436 &amp; -0.0023327 &amp; -0.0829103 &amp; -0.0038030 &amp; -0.0505250 &amp; -0.0725365 &amp; -0.0023602 &amp; 0.0798322 &amp; -0.0853690 &amp; 0.0009145 &amp; -0.0011304 &amp; -0.0208605 &amp; -0.0027458 &amp; -0.0343701 &amp; -0.0498913 &amp; -0.0043068 &amp; -0.0075059 &amp; -0.0253156\\
+0.0313870 &amp; 26.4569403 &amp; -0.0327681 &amp; 0.1819720 &amp; 0.0658044 &amp; 0.0493715 &amp; -0.0014282 &amp; 0.0814829 &amp; 0.0349934 &amp; 0.0142845 &amp; -0.0089849 &amp; -0.0099080 &amp; -0.1008260 &amp; -0.0393736 &amp; 0.0143756 &amp; -0.0244633 &amp; -0.0027997 &amp; -0.0181711 &amp; 0.0103471 &amp; -0.0022890 &amp; -0.0032829 &amp; -0.0093255 &amp; -0.0081605 &amp; 0.0002569 &amp; 0.0315375 &amp; -0.0123243 &amp; -0.0214223 &amp; 0.0049539 &amp; -0.0007691 &amp; -0.0018515 &amp; -0.0134848 &amp; -0.0022475 &amp; -0.0004188 &amp; -0.0045144 &amp; -0.0132967 &amp; -0.0124174 &amp; 0.0034001\\
+0.3099949 &amp; 0.8390886 &amp; 24.4503321 &amp; 0.1729348 &amp; 0.0934457 &amp; 0.0321815 &amp; -0.0267277 &amp; 0.0087048 &amp; -0.0021912 &amp; 0.0302956 &amp; -0.0032035 &amp; 0.0006191 &amp; -0.1521253 &amp; -0.0715879 &amp; 0.0056278 &amp; 0.0071042 &amp; -0.0144856 &amp; -0.0191906 &amp; 0.0105577 &amp; 0.0017698 &amp; 0.0010390 &amp; 0.0345185 &amp; -0.0182789 &amp; 0.0031992 &amp; 0.0403868 &amp; -0.0054272 &amp; 0.0001335 &amp; 0.0044897 &amp; 0.0016749 &amp; 0.0001555 &amp; 0.0103648 &amp; -0.0101681 &amp; 0.0003568 &amp; -0.0233486 &amp; 0.0033277 &amp; -0.0005987 &amp; 0.0038578\\
+0.1144901 &amp; 0.5757451 &amp; -1.2722234 &amp; 1.2160989 &amp; 0.0062697 &amp; 0.0816150 &amp; 0.1013514 &amp; 0.3125869 &amp; 0.0210286 &amp; 0.0555909 &amp; -0.0150318 &amp; -0.0165407 &amp; -0.1445600 &amp; 0.0487858 &amp; 0.0192345 &amp; -0.0704686 &amp; -0.0087177 &amp; -0.0391431 &amp; 0.0088795 &amp; -0.0063424 &amp; -0.0088908 &amp; -0.0488134 &amp; -0.0180227 &amp; 0.0096580 &amp; -0.0387576 &amp; -0.0299107 &amp; -0.0078520 &amp; 0.0073099 &amp; -0.0048056 &amp; 0.0003116 &amp; -0.0606210 &amp; -0.0120469 &amp; 0.0034674 &amp; 0.0070252 &amp; -0.0062778 &amp; 0.0020467 &amp; 0.0039665\\
+3.7964763 &amp; 0.1568425 &amp; -0.0148647 &amp; -0.3704717 &amp; 3.1095399 &amp; 0.1944162 &amp; -0.1411025 &amp; 0.0991326 &amp; -0.2710373 &amp; -0.0335810 &amp; 0.0047768 &amp; 0.0244740 &amp; 0.0483337 &amp; -0.0842275 &amp; 0.0564036 &amp; 0.1240587 &amp; -0.1280173 &amp; -0.0440467 &amp; -0.0087963 &amp; -0.0002455 &amp; 0.0103785 &amp; 0.0551498 &amp; -0.0972132 &amp; 0.0253428 &amp; 0.0222560 &amp; -0.0401442 &amp; -0.0322162 &amp; -0.0005304 &amp; -0.0003961 &amp; 0.0066268 &amp; -0.0116063 &amp; -0.1218783 &amp; 0.0144010 &amp; -0.0357875 &amp; -0.0312017 &amp; -0.0301103 &amp; 0.0027477\\
+2.4429976 &amp; 0.1555643 &amp; -2.3037156 &amp; -0.5867831 &amp; 0.1916352 &amp; 19.7705068 &amp; -0.0570307 &amp; -0.0764698 &amp; -0.3661813 &amp; 0.2220398 &amp; 0.0463221 &amp; 0.0307945 &amp; -0.1334399 &amp; 0.0152897 &amp; -0.0384419 &amp; 0.0239315 &amp; -0.0432547 &amp; -0.0185517 &amp; 0.0495889 &amp; 0.0196310 &amp; 0.0153048 &amp; 0.0141953 &amp; 0.0483615 &amp; -0.0189587 &amp; 0.0029423 &amp; 0.0081196 &amp; 0.0379048 &amp; 0.0158350 &amp; 0.0134440 &amp; 0.0110670 &amp; 0.0295173 &amp; 0.0424885 &amp; -0.0098409 &amp; -0.0070854 &amp; 0.0309741 &amp; 0.0494993 &amp; 0.0098400\\
+1.4985526 &amp; -2.2544938 &amp; -4.6751791 &amp; -0.1457801 &amp; 0.2025992 &amp; -0.3902728 &amp; 0.9380066 &amp; -0.3257358 &amp; -0.2367535 &amp; 0.2861175 &amp; 0.0273084 &amp; 0.0108387 &amp; -0.1146283 &amp; -0.0369948 &amp; 0.0231353 &amp; -0.2753094 &amp; -0.0243802 &amp; -0.0242380 &amp; 0.0699965 &amp; 0.0136577 &amp; 0.0070355 &amp; -0.0141566 &amp; 0.0212914 &amp; 0.0055639 &amp; -0.1348305 &amp; 0.0200959 &amp; 0.0192038 &amp; 0.0266404 &amp; 0.0050200 &amp; 0.0036903 &amp; 0.0289124 &amp; 0.0246605 &amp; 0.0009777 &amp; 0.0685034 &amp; 0.0235678 &amp; -0.0026924 &amp; 0.0184578\\
+2.7308330 &amp; 0.2690784 &amp; -1.2127645 &amp; -0.5501027 &amp; 0.2681691 &amp; -1.5699566 &amp; 0.1249955 &amp; 3.3799414 &amp; -0.1369772 &amp; 0.0001931 &amp; 0.0252613 &amp; 0.0295384 &amp; -0.1101010 &amp; 0.0933049 &amp; 0.0163681 &amp; -0.0434975 &amp; -0.0741339 &amp; -0.0853713 &amp; 0.0079681 &amp; 0.0108794 &amp; 0.0118984 &amp; -0.0401297 &amp; -0.0851020 &amp; 0.0085944 &amp; -0.0648169 &amp; -0.0514571 &amp; -0.0055554 &amp; 0.0020641 &amp; 0.0028094 &amp; 0.0057991 &amp; 0.0315230 &amp; -0.0599512 &amp; 0.0064843 &amp; -0.0081138 &amp; -0.0014915 &amp; 0.0150744 &amp; 0.0030071\\
+-0.9683146 &amp; 0.8794666 &amp; -0.7994212 &amp; -0.0234659 &amp; -1.2206209 &amp; -1.0987069 &amp; 0.1644044 &amp; 0.5600283 &amp; 3.6796103 &amp; -0.0669804 &amp; -0.0079786 &amp; -0.0118898 &amp; -0.1836071 &amp; 0.0438188 &amp; -0.0049503 &amp; -0.0346338 &amp; -0.1554470 &amp; -0.1563021 &amp; -0.0128171 &amp; -0.0019927 &amp; -0.0046591 &amp; -0.0848464 &amp; 0.0725904 &amp; -0.0060172 &amp; -0.0425841 &amp; -0.0707157 &amp; -0.0860212 &amp; -0.0046547 &amp; -0.0020219 &amp; -0.0036905 &amp; -0.0218639 &amp; -0.0081817 &amp; -0.0028534 &amp; -0.0344731 &amp; -0.0491865 &amp; -0.0249568 &amp; -0.0041017\\
+0.6434500 &amp; -0.8231972 &amp; 1.5090701 &amp; 0.0354688 &amp; 0.1330476 &amp; -0.2201188 &amp; -0.1506998 &amp; 0.1325695 &amp; 0.6955086 &amp; 24.1250683 &amp; 0.0166358 &amp; 0.0094905 &amp; 0.0087469 &amp; 0.0145403 &amp; -0.0042298 &amp; 0.0896471 &amp; 0.0103305 &amp; -0.0543459 &amp; 0.0142940 &amp; 0.0081136 &amp; 0.0064045 &amp; -0.0038667 &amp; 0.0316856 &amp; 0.0014652 &amp; -0.0359536 &amp; -0.0130044 &amp; -0.0142168 &amp; 0.0052488 &amp; 0.0047332 &amp; 0.0032123 &amp; -0.0027270 &amp; 0.0126470 &amp; 0.0031950 &amp; -0.0058918 &amp; -0.0046271 &amp; -0.0241025 &amp; 0.0046905\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -928,15 +937,15 @@ x\\
 <p><span class="math display">\[\begin{equation*}
 \left(
 \begin{array}{ccccccccc}
-65.766785 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--74.975438 &amp; 17.9395486 &amp; 0.0000000 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--11.142625 &amp; 3.8644179 &amp; 1.5076329 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--16.705030 &amp; 0.7809112 &amp; -0.3835061 &amp; 19.401497 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
-1.943894 &amp; -13.7631560 &amp; -0.4190424 &amp; -1.082113 &amp; 0.4591169 &amp; 0.0000000 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
--13.017641 &amp; 7.0876776 &amp; -0.3743285 &amp; -5.576205 &amp; -0.0504306 &amp; 3.0195363 &amp; 0.000000 &amp; 0.000000 &amp; 0.000000\\
-11.075814 &amp; 6.4582394 &amp; 0.3424943 &amp; -2.738378 &amp; -0.1750848 &amp; 0.4393645 &amp; 41.727393 &amp; 0.000000 &amp; 0.000000\\
--4.153708 &amp; -1.0353127 &amp; -0.3187322 &amp; -0.282347 &amp; 0.0323330 &amp; -0.1894225 &amp; 6.043551 &amp; 2.623814 &amp; 0.000000\\
--30.543898 &amp; 18.7154201 &amp; -0.1136240 &amp; -0.951428 &amp; -0.0365794 &amp; -0.9524253 &amp; 14.422079 &amp; -1.025192 &amp; 3.550537\\
+65.808191 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.00000\\
+-74.865586 &amp; 17.284226 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.00000\\
+9.354696 &amp; -7.683652 &amp; 1.4757187 &amp; 0.0000000 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.00000\\
+2.849204 &amp; -5.342327 &amp; -0.3717925 &amp; 2.5882778 &amp; 0.000000 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.00000\\
+-30.606037 &amp; 8.947088 &amp; -0.3353487 &amp; 0.0047757 &amp; 18.434524 &amp; 0.0000000 &amp; 0.0000000 &amp; 0.000000 &amp; 0.00000\\
+-5.855615 &amp; -9.896131 &amp; -0.4377737 &amp; 0.2769432 &amp; -1.596307 &amp; 0.4644539 &amp; 0.0000000 &amp; 0.000000 &amp; 0.00000\\
+7.895399 &amp; -4.869899 &amp; -0.4171599 &amp; -0.1849029 &amp; -4.369756 &amp; -0.0591090 &amp; 3.1103535 &amp; 0.000000 &amp; 0.00000\\
+32.496155 &amp; -21.749356 &amp; -0.3622310 &amp; -0.8832152 &amp; 3.525949 &amp; -0.0001023 &amp; -0.6648382 &amp; 2.818993 &amp; 0.00000\\
+-1.705493 &amp; 12.893694 &amp; 0.2471766 &amp; 0.0377730 &amp; -3.070608 &amp; -0.1708182 &amp; 0.0629370 &amp; 1.171024 &amp; 44.61553\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -944,15 +953,15 @@ x\\
 <p><span class="math display">\[\begin{equation*}
 \left(
 \begin{array}{ccccccccccccccccccccccccccccccccccccc}
-0.0010362 &amp; 65.769733 &amp; 0.0027176 &amp; 0.0173266 &amp; 0.0030893 &amp; 0.0007702 &amp; 0.0160497 &amp; 0.0022692 &amp; 0.0125158 &amp; 0.0133767 &amp; 0.0022461 &amp; 0.0024727 &amp; -0.0048175 &amp; 0.0032810 &amp; -0.0021053 &amp; 0.0106095 &amp; 0.0034114 &amp; 0.0050662 &amp; 0.0069058 &amp; 0.0020636 &amp; 0.0027441 &amp; -0.0028189 &amp; 0.0021419 &amp; 0.0069889 &amp; 0.0056734 &amp; 0.0040024 &amp; 0.0046971 &amp; 0.0009735 &amp; 0.0022410 &amp; 0.0023112 &amp; -0.0065299 &amp; 0.0017517 &amp; -0.0027556 &amp; 0.0001404 &amp; 0.0032982 &amp; 0.0028303 &amp; -0.0009766\\
--0.0009543 &amp; -74.978075 &amp; 17.9368141 &amp; -0.0166238 &amp; -0.0028516 &amp; -0.0038250 &amp; -0.0159975 &amp; -0.0025456 &amp; -0.0126902 &amp; -0.0141423 &amp; -0.0018443 &amp; -0.0025681 &amp; 0.0019309 &amp; -0.0031207 &amp; 0.0031670 &amp; -0.0119237 &amp; -0.0029377 &amp; -0.0071473 &amp; -0.0070198 &amp; -0.0018592 &amp; -0.0023410 &amp; 0.0058763 &amp; -0.0030906 &amp; -0.0042440 &amp; -0.0057776 &amp; -0.0029126 &amp; -0.0065502 &amp; -0.0006448 &amp; -0.0025902 &amp; -0.0027755 &amp; 0.0103281 &amp; -0.0022365 &amp; 0.0018017 &amp; 0.0007174 &amp; -0.0023879 &amp; -0.0038669 &amp; 0.0012630\\
-0.0005203 &amp; -11.142245 &amp; 3.8654732 &amp; 1.4928481 &amp; 0.0008086 &amp; 0.0141064 &amp; 0.0003391 &amp; 0.0013693 &amp; 0.0007527 &amp; -0.0049832 &amp; -0.0001417 &amp; 0.0005122 &amp; -0.0127037 &amp; 0.0004333 &amp; -0.0013551 &amp; -0.0046428 &amp; 0.0002569 &amp; 0.0014391 &amp; -0.0063811 &amp; 0.0009795 &amp; 0.0001157 &amp; -0.0097077 &amp; 0.0003644 &amp; -0.0080566 &amp; -0.0060429 &amp; 0.0012478 &amp; -0.0020366 &amp; -0.0036283 &amp; 0.0003323 &amp; 0.0009972 &amp; -0.0068885 &amp; 0.0004648 &amp; -0.0039471 &amp; -0.0031393 &amp; 0.0008275 &amp; -0.0016875 &amp; -0.0001595\\
-0.0003209 &amp; -16.701704 &amp; 0.7840614 &amp; -0.4040495 &amp; 19.4012416 &amp; -0.0122096 &amp; -0.0123049 &amp; 0.0044347 &amp; -0.0095287 &amp; -0.0158546 &amp; 0.0038931 &amp; 0.0030844 &amp; -0.0140497 &amp; -0.0025298 &amp; -0.0071916 &amp; -0.0117603 &amp; 0.0044882 &amp; -0.0061209 &amp; -0.0079715 &amp; 0.0049270 &amp; 0.0038168 &amp; -0.0002826 &amp; -0.0017330 &amp; 0.0016446 &amp; -0.0039984 &amp; 0.0040415 &amp; -0.0020382 &amp; 0.0023076 &amp; 0.0041805 &amp; 0.0039875 &amp; 0.0122399 &amp; -0.0010406 &amp; 0.0160895 &amp; 0.0063639 &amp; 0.0034201 &amp; 0.0032324 &amp; 0.0120354\\
-0.0004075 &amp; 1.946896 &amp; -13.7607178 &amp; -0.4133453 &amp; -1.0803734 &amp; 0.5144205 &amp; -0.0078435 &amp; 0.0048790 &amp; -0.0014629 &amp; -0.0102667 &amp; 0.0023615 &amp; 0.0013595 &amp; -0.0017203 &amp; 0.0012995 &amp; -0.0109247 &amp; -0.0070431 &amp; 0.0042063 &amp; -0.0016936 &amp; -0.0074509 &amp; 0.0029831 &amp; 0.0013728 &amp; -0.0071399 &amp; 0.0004802 &amp; -0.0324948 &amp; -0.0040249 &amp; 0.0033205 &amp; -0.0013620 &amp; -0.0039713 &amp; 0.0014126 &amp; 0.0015925 &amp; -0.0018819 &amp; 0.0002526 &amp; -0.0070904 &amp; -0.0006064 &amp; 0.0037668 &amp; 0.0008697 &amp; -0.0014716\\
-0.0005524 &amp; -13.014488 &amp; 7.0910298 &amp; -0.3788566 &amp; -5.5743527 &amp; -0.0360741 &amp; 3.0194561 &amp; 0.0018710 &amp; 0.0112891 &amp; -0.0024742 &amp; 0.0029790 &amp; 0.0028278 &amp; -0.0047533 &amp; 0.0018556 &amp; -0.0002145 &amp; -0.0039175 &amp; 0.0019185 &amp; 0.0088021 &amp; -0.0049643 &amp; 0.0025029 &amp; 0.0028135 &amp; -0.0046525 &amp; 0.0013722 &amp; -0.0100088 &amp; -0.0057103 &amp; 0.0015952 &amp; -0.0022714 &amp; -0.0022526 &amp; 0.0030801 &amp; 0.0026975 &amp; 0.0034906 &amp; 0.0022105 &amp; -0.0085793 &amp; -0.0021316 &amp; 0.0022442 &amp; -0.0060431 &amp; -0.0001639\\
-0.0004754 &amp; 11.076626 &amp; 6.4598017 &amp; 0.3418874 &amp; -2.7384872 &amp; -0.1874785 &amp; 0.4385450 &amp; 41.7285141 &amp; 0.0108911 &amp; 0.0056823 &amp; 0.0013799 &amp; 0.0013117 &amp; 0.0017649 &amp; 0.0004434 &amp; 0.0066037 &amp; 0.0059019 &amp; 0.0015821 &amp; 0.0092802 &amp; 0.0025425 &amp; 0.0017885 &amp; 0.0012023 &amp; 0.0029985 &amp; 0.0006393 &amp; 0.0040936 &amp; 0.0023899 &amp; 0.0010272 &amp; 0.0110886 &amp; 0.0029971 &amp; 0.0015507 &amp; 0.0015320 &amp; 0.0011880 &amp; 0.0013957 &amp; 0.0089104 &amp; 0.0036127 &amp; 0.0011684 &amp; 0.0131515 &amp; -0.0019633\\
-0.0010368 &amp; -4.150312 &amp; -1.0310496 &amp; -0.3212212 &amp; -0.2791283 &amp; 0.0226614 &amp; -0.1890716 &amp; 6.0468020 &amp; 2.6224047 &amp; -0.0047591 &amp; 0.0040371 &amp; 0.0043228 &amp; 0.0001767 &amp; 0.0034180 &amp; 0.0033794 &amp; -0.0041537 &amp; 0.0024314 &amp; -0.0075234 &amp; -0.0039264 &amp; 0.0036163 &amp; 0.0045220 &amp; 0.0037291 &amp; 0.0026739 &amp; 0.0037257 &amp; -0.0031199 &amp; 0.0036405 &amp; -0.0130276 &amp; -0.0030097 &amp; 0.0035933 &amp; 0.0044305 &amp; 0.0007499 &amp; 0.0034120 &amp; 0.0024961 &amp; -0.0023203 &amp; 0.0033733 &amp; -0.0221044 &amp; -0.0039983\\
--0.0002361 &amp; -30.543563 &amp; 18.7155969 &amp; -0.1110339 &amp; -0.9502979 &amp; -0.0176969 &amp; -0.9390843 &amp; 14.4223885 &amp; -1.0141920 &amp; 3.5484042 &amp; 0.0005605 &amp; 0.0007478 &amp; -0.0067633 &amp; 0.0002541 &amp; 0.0108423 &amp; -0.0031437 &amp; 0.0000275 &amp; 0.0097553 &amp; -0.0069550 &amp; 0.0008352 &amp; 0.0010575 &amp; -0.0072324 &amp; -0.0002358 &amp; -0.0102601 &amp; -0.0061879 &amp; 0.0005823 &amp; 0.0140258 &amp; -0.0088380 &amp; 0.0001186 &amp; 0.0010177 &amp; -0.0059889 &amp; 0.0000605 &amp; -0.0212925 &amp; -0.0092250 &amp; 0.0009169 &amp; 0.0049728 &amp; -0.0069410\\
+0.0011394 &amp; 65.811100 &amp; 0.0026828 &amp; 0.0179550 &amp; 0.0124544 &amp; 0.0030995 &amp; 0.0011131 &amp; 0.0154526 &amp; 0.0141323 &amp; 0.0029097 &amp; 0.0022639 &amp; 0.0024753 &amp; -0.0051074 &amp; 0.0052370 &amp; 0.0029986 &amp; -0.0030383 &amp; 0.0116217 &amp; 0.0072819 &amp; 0.0032632 &amp; 0.0020185 &amp; 0.0027761 &amp; -0.0029934 &amp; 0.0044637 &amp; 0.0025083 &amp; 0.0076316 &amp; 0.0062807 &amp; 0.0009088 &amp; 0.0031353 &amp; 0.0021989 &amp; 0.0022583 &amp; -0.0068877 &amp; 0.0026408 &amp; 0.0017582 &amp; -0.0028025 &amp; -0.0005498 &amp; -0.0006978 &amp; 0.0029523\\
+-0.0009327 &amp; -74.868219 &amp; 17.2814028 &amp; -0.0171721 &amp; -0.0124028 &amp; -0.0033578 &amp; -0.0034549 &amp; -0.0167099 &amp; -0.0147905 &amp; -0.0026319 &amp; -0.0018497 &amp; -0.0026334 &amp; 0.0022133 &amp; -0.0072574 &amp; -0.0027986 &amp; 0.0029997 &amp; -0.0122256 &amp; -0.0077586 &amp; -0.0025894 &amp; -0.0019133 &amp; -0.0023612 &amp; 0.0060892 &amp; -0.0071260 &amp; -0.0021073 &amp; -0.0046838 &amp; -0.0057077 &amp; -0.0005306 &amp; -0.0031990 &amp; -0.0025540 &amp; -0.0028112 &amp; 0.0107332 &amp; -0.0048917 &amp; -0.0015221 &amp; 0.0019845 &amp; 0.0025799 &amp; 0.0024183 &amp; -0.0034014\\
+0.0007182 &amp; 9.355457 &amp; -7.6821413 &amp; 1.4642276 &amp; 0.0029031 &amp; 0.0017491 &amp; 0.0160456 &amp; 0.0041506 &amp; -0.0009322 &amp; 0.0018598 &amp; 0.0000596 &amp; 0.0008965 &amp; -0.0118229 &amp; 0.0041106 &amp; 0.0010445 &amp; -0.0023252 &amp; -0.0028342 &amp; -0.0045938 &amp; 0.0019011 &amp; 0.0012536 &amp; 0.0004891 &amp; -0.0119409 &amp; 0.0004239 &amp; 0.0005827 &amp; -0.0080602 &amp; -0.0052062 &amp; -0.0041844 &amp; 0.0023987 &amp; 0.0007241 &amp; 0.0014478 &amp; -0.0100056 &amp; 0.0000143 &amp; 0.0005269 &amp; -0.0041354 &amp; -0.0044382 &amp; -0.0008395 &amp; 0.0024336\\
+0.0008463 &amp; 2.852466 &amp; -5.3378883 &amp; -0.3731019 &amp; 2.5880879 &amp; 0.0035431 &amp; -0.0124662 &amp; 0.0021732 &amp; -0.0033442 &amp; 0.0034306 &amp; 0.0035407 &amp; 0.0043729 &amp; 0.0005284 &amp; -0.0081710 &amp; 0.0028603 &amp; 0.0033858 &amp; -0.0032954 &amp; -0.0028055 &amp; 0.0031395 &amp; 0.0041762 &amp; 0.0048356 &amp; 0.0031932 &amp; -0.0142474 &amp; 0.0029275 &amp; 0.0055184 &amp; -0.0023694 &amp; -0.0037381 &amp; 0.0028198 &amp; 0.0031779 &amp; 0.0043386 &amp; 0.0001426 &amp; -0.0246987 &amp; 0.0031479 &amp; 0.0018170 &amp; -0.0026949 &amp; -0.0029654 &amp; 0.0037597\\
+0.0004841 &amp; -30.602174 &amp; 8.9505123 &amp; -0.3583846 &amp; -0.0063200 &amp; 18.4341426 &amp; -0.0131894 &amp; -0.0142344 &amp; -0.0178857 &amp; 0.0049266 &amp; 0.0038134 &amp; 0.0026403 &amp; -0.0150289 &amp; -0.0079182 &amp; -0.0022729 &amp; -0.0064190 &amp; -0.0135303 &amp; -0.0092562 &amp; 0.0044623 &amp; 0.0048750 &amp; 0.0029923 &amp; 0.0008812 &amp; -0.0030335 &amp; -0.0017580 &amp; 0.0016772 &amp; -0.0054044 &amp; 0.0025820 &amp; 0.0034631 &amp; 0.0035529 &amp; 0.0037748 &amp; 0.0135753 &amp; 0.0014463 &amp; -0.0003528 &amp; 0.0156161 &amp; 0.0071238 &amp; 0.0121256 &amp; 0.0029025\\
+0.0003874 &amp; -5.852266 &amp; -9.8937139 &amp; -0.4331818 &amp; 0.2739783 &amp; -1.5935068 &amp; 0.5202450 &amp; -0.0096248 &amp; -0.0120901 &amp; 0.0048998 &amp; 0.0030788 &amp; 0.0018489 &amp; -0.0013603 &amp; -0.0033728 &amp; 0.0008880 &amp; -0.0103381 &amp; -0.0088833 &amp; -0.0093492 &amp; 0.0048677 &amp; 0.0023857 &amp; 0.0016471 &amp; -0.0060819 &amp; -0.0039944 &amp; 0.0011725 &amp; -0.0336391 &amp; -0.0050799 &amp; -0.0039798 &amp; 0.0047752 &amp; 0.0032083 &amp; 0.0017727 &amp; -0.0009775 &amp; -0.0022484 &amp; -0.0000758 &amp; -0.0076441 &amp; -0.0002095 &amp; -0.0008402 &amp; 0.0039724\\
+0.0009794 &amp; 7.897949 &amp; -4.8657250 &amp; -0.4192988 &amp; -0.1706668 &amp; -4.3665223 &amp; -0.0431798 &amp; 3.1130861 &amp; 0.0003994 &amp; 0.0027778 &amp; 0.0031565 &amp; 0.0035517 &amp; -0.0046729 &amp; 0.0126048 &amp; 0.0025811 &amp; -0.0008184 &amp; -0.0015059 &amp; -0.0035173 &amp; 0.0029252 &amp; 0.0036348 &amp; 0.0033775 &amp; -0.0077491 &amp; 0.0003639 &amp; 0.0006587 &amp; -0.0110052 &amp; -0.0049381 &amp; -0.0023210 &amp; 0.0028302 &amp; 0.0032799 &amp; 0.0034218 &amp; 0.0007832 &amp; -0.0030455 &amp; 0.0018800 &amp; -0.0078607 &amp; -0.0029973 &amp; 0.0014287 &amp; 0.0027010\\
+0.0004513 &amp; 32.497603 &amp; -21.7472383 &amp; -0.3531265 &amp; -0.8698064 &amp; 3.5281725 &amp; 0.0211504 &amp; -0.6441554 &amp; 2.8230007 &amp; 0.0016264 &amp; 0.0022221 &amp; 0.0020523 &amp; -0.0050918 &amp; 0.0126997 &amp; 0.0011718 &amp; 0.0031078 &amp; 0.0023087 &amp; -0.0013939 &amp; 0.0021320 &amp; 0.0017485 &amp; 0.0020262 &amp; -0.0133620 &amp; 0.0145100 &amp; 0.0007752 &amp; -0.0096535 &amp; -0.0027140 &amp; -0.0070897 &amp; 0.0024010 &amp; 0.0018567 &amp; 0.0022386 &amp; -0.0107803 &amp; 0.0075089 &amp; 0.0001262 &amp; -0.0163995 &amp; -0.0087930 &amp; -0.0044817 &amp; 0.0016776\\
+0.0001220 &amp; -1.703730 &amp; 12.8951591 &amp; 0.2469253 &amp; 0.0520590 &amp; -3.0701076 &amp; -0.1781444 &amp; 0.0661404 &amp; 1.1747757 &amp; 44.6171637 &amp; 0.0019488 &amp; 0.0021274 &amp; -0.0008683 &amp; 0.0110902 &amp; 0.0006613 &amp; 0.0107921 &amp; 0.0028815 &amp; -0.0005924 &amp; 0.0020418 &amp; 0.0021579 &amp; 0.0025327 &amp; 0.0018935 &amp; 0.0130364 &amp; 0.0013778 &amp; 0.0024626 &amp; -0.0004299 &amp; -0.0006915 &amp; 0.0018578 &amp; 0.0014456 &amp; 0.0026235 &amp; -0.0003589 &amp; 0.0108982 &amp; 0.0017771 &amp; 0.0001452 &amp; 0.0003489 &amp; -0.0058175 &amp; 0.0028702\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -962,7 +971,7 @@ x\\
 \begin{array}{c}
 x\\
 \hline
-5508.177\\
+5494.59\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -972,7 +981,7 @@ x\\
 \begin{array}{c}
 x\\
 \hline
-7.38e-05\\
+7.65e-05\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -982,6 +991,56 @@ x\\
 <h1>Empirical Investigation</h1>
 <section id="impulse-response-functions-irfs" class="level2">
 <h2 class="anchored" data-anchor-id="impulse-response-functions-irfs">Impulse Response Functions (IRFs)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>irf_fevd <span class="ot">=</span> <span class="cf">function</span>(parameters, usedata, Bposteriors){</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Unpack variables</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> usedata<span class="sc">$</span>N</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  K <span class="ot">=</span> usedata<span class="sc">$</span>K</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">=</span> usedata<span class="sc">$</span>p</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  S <span class="ot">=</span> parameters<span class="sc">$</span>S</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  h <span class="ot">=</span> parameters<span class="sc">$</span>h</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  B0.posterior <span class="ot">=</span> Bposteriors<span class="sc">$</span>B0.posterior</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  Bp.posterior <span class="ot">=</span> Bposteriors<span class="sc">$</span>Bp.posterior</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  B.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,S))</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>A.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,K,S))</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  B               <span class="ot">=</span> <span class="fu">solve</span>(B0.posterior[,,s])</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  B.posterior[,,s]<span class="ot">=</span> B</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  A.posterior[,,s]<span class="ot">=</span> B <span class="sc">%*%</span> Bp.posterior[,,s]</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>IRF.posterior     <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,h<span class="sc">+</span><span class="dv">1</span>,S))</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>IRF.inf.posterior <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,S))</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>FEVD.posterior    <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,h<span class="sc">+</span><span class="dv">1</span>,S))</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>J                 <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">diag</span>(N),<span class="fu">matrix</span>(<span class="dv">0</span>,N,N<span class="sc">*</span>(p<span class="dv">-1</span>)))</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>  A.bold          <span class="ot">=</span> <span class="fu">rbind</span>(A.posterior[,<span class="dv">2</span><span class="sc">:</span>(<span class="dv">1</span><span class="sc">+</span>N<span class="sc">*</span>p),s],<span class="fu">cbind</span>(<span class="fu">diag</span>(N<span class="sc">*</span>(p<span class="dv">-1</span>)),<span class="fu">matrix</span>(<span class="dv">0</span>,N<span class="sc">*</span>(p<span class="dv">-1</span>),N)))</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>  IRF.inf.posterior[,,s]          <span class="ot">=</span> J <span class="sc">%*%</span> <span class="fu">solve</span>(<span class="fu">diag</span>(N<span class="sc">*</span>p)<span class="sc">-</span>A.bold) <span class="sc">%*%</span> <span class="fu">t</span>(J) <span class="sc">%*%</span> B.posterior[,,s]</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>  A.bold.power    <span class="ot">=</span> A.bold</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(h<span class="sc">+</span><span class="dv">1</span>)){</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (i<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>      IRF.posterior[,,i,s]        <span class="ot">=</span> B.posterior[,,s]</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>      IRF.posterior[,,i,s]        <span class="ot">=</span> J <span class="sc">%*%</span> A.bold.power <span class="sc">%*%</span> <span class="fu">t</span>(J) <span class="sc">%*%</span> B.posterior[,,s]</span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>      A.bold.power                <span class="ot">=</span> A.bold.power <span class="sc">%*%</span> A.bold</span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N){</span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (nn <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N){</span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>        FEVD.posterior[n,nn,i,s]  <span class="ot">=</span> <span class="fu">sum</span>(IRF.posterior[n,nn,<span class="dv">1</span><span class="sc">:</span>i,s]<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>    FEVD.posterior[,,i,s]         <span class="ot">=</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">apply</span>(FEVD.posterior[,,i,s],<span class="dv">1</span>,sum))<span class="sc">%*%</span>FEVD.posterior[,,i,s]</span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a>FEVD.posterior    <span class="ot">=</span> <span class="dv">100</span><span class="sc">*</span>FEVD.posterior</span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(<span class="at">IRF.posterior =</span> IRF.posterior, <span class="at">IRF.inf.posterior=</span> IRF.inf.posterior, <span class="at">FEVD.posterior =</span> FEVD.posterior)</span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+
+</div>
 <div class="cell">
 
 </div>
@@ -1011,6 +1070,9 @@ x\\
 </div>
 </div>
 </div>
+<div class="cell">
+
+</div>
 </section>
 <section id="forecast-error-variance-decomposition" class="level2">
 <h2 class="anchored" data-anchor-id="forecast-error-variance-decomposition">Forecast Error Variance Decomposition</h2>
@@ -1019,28 +1081,51 @@ x\\
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+
 </div>
 </section>
 </section>

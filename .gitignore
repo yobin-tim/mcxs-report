@@ -9,3 +9,6 @@
 .httr-oauth
 .DS_Store
 *.Rproj
+*.pdf
+data.irf_fevd.RData
+

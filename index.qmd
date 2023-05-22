@@ -122,9 +122,9 @@ df[55:128,"House Price Index"]          <- as.numeric(homeprice.qtr)
 df                                      <- na.omit(df)
 df                                      <- df %>% select("Nominal GDP (log)", "Aggregate Consumption (log)",
                                                          "% Change in CPI, yoy", "US FFR Max Target Rate", "Quantity of new homes",
-                                                         "House Price Index", "Owner-occupied home loan rates",
-                                                         "M1 Money Supply (logs)", ,
-                                                         "RBA Target Cash Rate")
+                                                         "House Price Index", "Owner-occupied home loan rates", 
+                                                         "RBA Target Cash Rate","M1 Money Supply (logs)")
+                                            
 ```
 
 ```{r , eval=TRUE}
@@ -160,6 +160,20 @@ for (j in 1:ncol(df)){
 }
 
 ```
+```{r : save pdf of data plots, eval=FALSE}
+pdf(file = "dataplot.pdf", width = 16, height = 9)
+var_names <- colnames(df)
+date_range <- as.yearqtr(rownames(df), format = "%Y Q%q")
+par(mfrow = c(3,3), mar=c(2,2,2,2))
+for (j in 1:ncol(df)){
+  plot(x = date_range, y = df[,j],,type='l',
+       main = paste(var_names[j]), ylab = "", xlab = "",
+       lwd = 2.5,
+       ylim = c(min(df[,j]),max(df[,j])))
+}
+dev.off()
+```
+
 
 
 ### ADF Tests
@@ -232,11 +246,32 @@ for (j in 1:ncol(df)){
 }
 
 ```
+```{r, eval=FALSE}
+pdf(file = "acf.pdf", width = 12, height = 8)
+par(mfrow = c(3,3), mar=c(2,2,2,2))
+for (j in 1:ncol(df)){
+  acf(df[,j], xlab="")
+  title(main=var_names[j])
+}
+dev.off()
+```
+
+
 ### PACF Plots
 ```{r : PACF, include=TRUE}
 #| label: PACF-Plots
 #| fig-cap-location: top
 #| fig-cap: "PACF Plots for our data"
+par(mfrow = c(3,3), mar=c(2,2,2,2))
+for (j in 1:ncol(df)){
+  pacf(df[,j], xlab="")
+  title(main=var_names[j])
+}
+```
+
+```{r, eval=FALSE}
+pdf(file = "pacf.pdf", width = 12, height = 8)
+
 par(mfrow = c(3,3), mar=c(2,2,2,2))
 for (j in 1:ncol(df)){
   pacf(df[,j], xlab="")
@@ -386,7 +421,7 @@ parameters = list(
   kappa4    = 1,       # VAR prior persistence
   S         = 5000,
   S.burnin  = 100,
-  h         = 8        # forecast horizon
+  h         = 16        # forecast horizon
 )
 ```
 
@@ -787,7 +822,7 @@ ext.sim.struct <- ext.sampling(parameters, ext.sim.struct, ext.sim.prior, artifi
 save(ext.sim.struct, file = "ext.sim.struct.RData")
 ```
 
-```{r : load simulation struct}
+```{r : load simulation struct, eval=TRUE}
 load(file = "ext.sim.struct.RData")
 ```
 
@@ -824,7 +859,7 @@ ext.struct <- ext.sampling(parameters, ext.struct, ext.prior, mydata)
 save(ext.struct, file = "ext.struct.RData")
 ```
 
-```{r : load struct}
+```{r : load struct, eval=TRUE}
 load(file = "ext.struct.RData")
 ```
 
@@ -855,8 +890,9 @@ ext.data_kappap = pmatrix(ext.struct.means$kappap)
 # Empirical Investigation
 
 ## Impulse Response Functions (IRFs)
-```{r}
+```{r : function to compute the irf and fevd matrices, echo=TRUE}
 irf_fevd = function(parameters, usedata, Bposteriors){
+  # Unpack variables
   N = usedata$N
   K = usedata$K
   p = usedata$p
@@ -902,9 +938,18 @@ list(IRF.posterior = IRF.posterior, IRF.inf.posterior= IRF.inf.posterior, FEVD.p
 }
 ```
 
-```{r}
+```{r, eval=FALSE}
 data.irf_fevd = irf_fevd(parameters, mydata, Bposteriors)
 ```
+
+```{r, eval=FALSE}
+save(data.irf_fevd, file = "data.irf_fevd.RData")
+```
+
+```{r, eval=TRUE}
+load("data.irf_fevd.RData")
+```
+
 
 ```{r : Plotting the effects of the AU CR shock}
 plot_irf = function(position, fevd, parameters){
@@ -942,11 +987,9 @@ par(mfrow=c(3,3), mar=c(2,2,2,2))
 for (n in 1:N){
   ylims     = range(IRFs.k1[n,hh],IRFs.k1.hdi[,n,1:4],0)
   p1 <- plot(hh,IRFs.k1[n,hh], type="l", ylim=ylims, axes=FALSE, xlab="", main=rownames(IRFs.k1)[n])
-  # if (n==5 | n==6){
-    axis(1,c(1,2,5,7,9),c("","1 quarter","1 year","6 quarters", "2 years"))
-  # } else {
-  #   axis(1,c(1,2,5,7),c("","","",""))
-  # }
+
+  axis(1,c(1,2,5,7,9,13,17),c("","1 quarter","1 year","6 quarters", "2 years", "3 years", "4 years"))
+  
   axis(2,c(ylims[1],0,ylims[2]),round(c(ylims[1],0,ylims[2]),3))
   polygon(c(hh,(h+1):1), c(IRFs.k1.hdi[1,n,hh],IRFs.k1.hdi[2,n,(h+1):1]), col=mcxs1.shade1,border=mcxs1.shade1)
   abline(h=0)
@@ -961,7 +1004,7 @@ return(list(p1))
 #| label: cashrate.irf
 #| fig-cap: "IRF plots for the AU Cash Rate Shock"
 #| fig-cap-location: top
-cashrate.irf = plot_irf(9, data.irf_fevd, parameters)
+cashrate.irf = plot_irf(8, data.irf_fevd, parameters)
 ```
 
 ```{r}
@@ -970,6 +1013,16 @@ cashrate.irf = plot_irf(9, data.irf_fevd, parameters)
 #| fig-cap-location: top
 usffr.irf = plot_irf(4, data.irf_fevd, parameters)
 ```
+```{r, eval=FALSE}
+pdf(file = "aucr_irf.pdf", onefile = FALSE, width = 16, height = 9)
+plot_irf(8, data.irf_fevd, parameters)
+dev.off()
+
+pdf(file = "usffr_irf.pdf", onefile = FALSE, width = 16, height = 9)
+plot_irf(4, data.irf_fevd, parameters)
+dev.off()
+```
+
 
 ## Forecast Error Variance Decomposition
 
@@ -990,12 +1043,13 @@ colors = c("deepskyblue1","deepskyblue2","deepskyblue","deepskyblue3","deepskybl
 
 par(mar=rep(4,4),cex.axis=1, cex.lab=0.8)
 p1 <- plot(hh,fevd.mat[1,], type="n", ylim=c(0,100), axes=FALSE, xlab="", ylab="")
-axis(1,hh,c("","1 quarter","","","1 year","","","","2 years"))
+axis(1,c(1,2,5,7,9,13,17),c("","1 quarter","1 year","6 quarters", "2 years", "3 years", "4 years"))
 axis(2,c(0,50,100),c("",colnames(df)[position],""))
 for (n in 1:N){
   polygon(c(hh,(h+1):1), c(fevd.mat[n,hh],fevd.mat[n+1,(h+1):1]), col=colors[n],border=colors[n])
 }
 axis(4, (0.5*(fevd.mat[(1:N),(h+1)]+fevd.mat[2:(N+1),(h+1)]))[c(ffr.pos,position,cr.pos)], c("us.mps","","au.mps")) # fix position of terms
+
 return(list(p1))
 }
 ```
@@ -1018,16 +1072,58 @@ cpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
 ```
 
 ```{r}
+variable.choice = "US FFR Max Target Rate"
+position = which(colnames(df) == variable.choice)
+usffr.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
+```{r}
+variable.choice = "Quantity of new homes"
+position = which(colnames(df) == variable.choice)
+nh.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
+
+
+```{r}
 variable.choice = "House Price Index"
 position = which(colnames(df) == variable.choice)
 hpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
 ```
+
+```{r, warning=FALSE}
+variable.choice = "Owner-occupied home loan rates"
+position = which(colnames(df) == variable.choice)
+hlr.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
+```{r, warning=FALSE}
+variable.choice = "RBA Target Cash Rate"
+position = which(colnames(df) == variable.choice)
+aucr.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
 
 ```{r}
 variable.choice = "M1 Money Supply (logs)"
 position = which(colnames(df) == variable.choice)
 m1.fevd = plot_fevd(position, data.irf_fevd, parameters)
 ```
+
+
+```{r, eval=FALSE}
+fevd.plots = c("gdp.fevd", "con.fevd", "cpi.fevd", "usffr.fevd", "nh.fevd", "hpi.fevd", "hlr.fevd", "aucr.fevd", "m1.fevd")
+  # Save each plot as an EPS file
+  for (i in 1:length(fevd.plots)) {
+    filename <- paste0(fevd.plots[i], ".pdf")
+    pdf(file = filename, onefile = FALSE, height=9, width = 16)
+    plot_fevd(i, data.irf_fevd, parameters)
+    dev.off()
+  }
+
+```
+
+
 
 # Appendix
 
