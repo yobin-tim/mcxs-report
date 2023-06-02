@@ -189,7 +189,7 @@ div.csl-indent {
   <li><a href="#model-and-hypothesis" id="toc-model-and-hypothesis" class="nav-link" data-scroll-target="#model-and-hypothesis">Model and Hypothesis</a>
   <ul class="collapse">
   <li><a href="#identification" id="toc-identification" class="nav-link" data-scroll-target="#identification">Identification</a></li>
-  <li><a href="#basic-model" id="toc-basic-model" class="nav-link" data-scroll-target="#basic-model">Basic Model</a>
+  <li><a href="#baseline-model" id="toc-baseline-model" class="nav-link" data-scroll-target="#baseline-model">Baseline Model</a>
   <ul class="collapse">
   <li><a href="#prior-distribution" id="toc-prior-distribution" class="nav-link" data-scroll-target="#prior-distribution">Prior distribution</a></li>
   <li><a href="#likelihood-function" id="toc-likelihood-function" class="nav-link" data-scroll-target="#likelihood-function">Likelihood Function</a></li>
@@ -209,7 +209,7 @@ div.csl-indent {
   </ul></li>
   <li><a href="#empirical-investigation" id="toc-empirical-investigation" class="nav-link" data-scroll-target="#empirical-investigation">Empirical Investigation</a>
   <ul class="collapse">
-  <li><a href="#baseline-model" id="toc-baseline-model" class="nav-link" data-scroll-target="#baseline-model">Baseline Model</a>
+  <li><a href="#baseline-model-1" id="toc-baseline-model-1" class="nav-link" data-scroll-target="#baseline-model-1">Baseline Model</a>
   <ul class="collapse">
   <li><a href="#impulse-response-functions-irfs" id="toc-impulse-response-functions-irfs" class="nav-link" data-scroll-target="#impulse-response-functions-irfs">Impulse Response Functions (IRFs)</a></li>
   <li><a href="#forecast-error-variance-decomposition" id="toc-forecast-error-variance-decomposition" class="nav-link" data-scroll-target="#forecast-error-variance-decomposition">Forecast Error Variance Decomposition</a></li>
@@ -220,7 +220,14 @@ div.csl-indent {
   <li><a href="#forecast-error-variance-decomposition-1" id="toc-forecast-error-variance-decomposition-1" class="nav-link" data-scroll-target="#forecast-error-variance-decomposition-1">Forecast Error Variance Decomposition</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a>
+  <ul class="collapse">
+  <li><a href="#baseline-model-2" id="toc-baseline-model-2" class="nav-link" data-scroll-target="#baseline-model-2">Baseline Model</a>
+  <ul class="collapse">
+  <li><a href="#forecast-error-variance-decomposition-fevd" id="toc-forecast-error-variance-decomposition-fevd" class="nav-link" data-scroll-target="#forecast-error-variance-decomposition-fevd">Forecast Error Variance Decomposition (FEVD)</a></li>
+  <li><a href="#extended-model-2" id="toc-extended-model-2" class="nav-link" data-scroll-target="#extended-model-2">Extended Model</a></li>
+  </ul></li>
+  </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -495,8 +502,8 @@ Y_t =
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="basic-model" class="level2">
-<h2 class="anchored" data-anchor-id="basic-model">Basic Model</h2>
+<section id="baseline-model" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model">Baseline Model</h2>
 <section id="prior-distribution" class="level3">
 <h3 class="anchored" data-anchor-id="prior-distribution">Prior distribution</h3>
 <p>Given this parameterisation, we can write down the kernel of the <strong>prior</strong> given hyperparameters <span class="math inline">\((\underline B, \underline \Omega, \underline S, \underline \nu)\)</span> as follows: <span class="math display">\[
@@ -1118,6 +1125,8 @@ x\\
 </section>
 <section id="empirical-investigation" class="level1">
 <h1>Empirical Investigation</h1>
+<p>In this section, I explore how the variables in my data respond to a domestic monetary policy shock (i.e.&nbsp;a 25 basis points cash rate shock) and a foreign monetary policy shock (i.e.&nbsp;a 25 basis points US Federal Funds Rate shock) using Impulse Response Function (IRF) graphs. I also plot the Forecast Error Variance Decomposition (FEVD) plots to illustrate what extent of the variability of my variables are explained by the structural shocks the model, and how these explainability evolves over time.</p>
+<p>The <code>irf_fevd</code> function below computes and stores the posterior IRF and FEVD values for each variable and each shock. The implementation follows closely from <a href="https://github.com/donotdespair">Tomasz Woźniak</a>’s lecture notes.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>irf_fevd <span class="ot">=</span> <span class="cf">function</span>(parameters, usedata, Bposteriors){</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Unpack variables</span></span>
@@ -1165,8 +1174,9 @@ x\\
 <span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(<span class="at">IRF.posterior =</span> IRF.posterior, <span class="at">IRF.inf.posterior=</span> IRF.inf.posterior, <span class="at">FEVD.posterior =</span> FEVD.posterior)</span>
 <span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="baseline-model" class="level2">
-<h2 class="anchored" data-anchor-id="baseline-model">Baseline Model</h2>
+<p>The next two subsections plot and explain the IRFs and selected FEVDs for the baseline and the extended model respectively.</p>
+<section id="baseline-model-1" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model-1">Baseline Model</h2>
 <div class="cell">
 
 </div>
@@ -1178,10 +1188,56 @@ x\\
 </div>
 <section id="impulse-response-functions-irfs" class="level3">
 <h3 class="anchored" data-anchor-id="impulse-response-functions-irfs">Impulse Response Functions (IRFs)</h3>
+<p>The <code>plot_irf</code> function plots the IRF of all variables given the position of the structural shock.</p>
 <div class="cell">
-
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>plot_irf <span class="ot">=</span> <span class="cf">function</span>(position, fevd, parameters){</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Unpack results</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>IRF.posterior <span class="ot">=</span> fevd<span class="sc">$</span>IRF.posterior</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>IRF.posterior.mps <span class="ot">=</span> IRF.posterior[,position,,]</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>IRFs.k1           <span class="ot">=</span> <span class="fu">apply</span>(IRF.posterior.mps,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,median)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>IRF.posterior.mps <span class="ot">=</span> IRF.posterior.mps<span class="sc">*</span>(<span class="fl">0.25</span><span class="sc">/</span>IRFs.k1[position,<span class="dv">1</span>])</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>IRFs.k1           <span class="ot">=</span> <span class="fu">apply</span>(IRF.posterior.mps,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,median)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>IRFs.inf.k1       <span class="ot">=</span> <span class="fu">apply</span>(IRF.posterior.mps,<span class="dv">1</span>,mean)</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>var_names         <span class="ot">=</span> <span class="fu">colnames</span>(df)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(IRFs.k1) <span class="ot">=</span> var_names</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>IRFs.k1.hdi       <span class="ot">=</span> <span class="fu">apply</span>(IRF.posterior.mps,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, hdi, <span class="at">credMass=</span><span class="fl">0.68</span>)</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>h                 <span class="ot">=</span> parameters<span class="sc">$</span>h</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>hh                <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span>(h<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define colours</span></span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>mcxs1  <span class="ot">=</span> <span class="st">"#05386B"</span></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>mcxs2  <span class="ot">=</span> <span class="st">"#379683"</span></span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>mcxs3  <span class="ot">=</span> <span class="st">"#5CDB95"</span></span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>mcxs4  <span class="ot">=</span> <span class="st">"#8EE4AF"</span></span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>mcxs5  <span class="ot">=</span> <span class="st">"#EDF5E1"</span></span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>purple <span class="ot">=</span> <span class="st">"#b02442"</span></span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>mcxs1.rgb   <span class="ot">=</span> <span class="fu">col2rgb</span>(mcxs1)</span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>mcxs1.shade1<span class="ot">=</span> <span class="fu">rgb</span>(mcxs1.rgb[<span class="dv">1</span>],mcxs1.rgb[<span class="dv">2</span>],mcxs1.rgb[<span class="dv">3</span>], <span class="at">alpha=</span><span class="dv">120</span>, <span class="at">maxColorValue=</span><span class="dv">255</span>)</span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>mcxs2.rgb   <span class="ot">=</span> <span class="fu">col2rgb</span>(mcxs2)</span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>mcxs2.shade1<span class="ot">=</span> <span class="fu">rgb</span>(mcxs2.rgb[<span class="dv">1</span>],mcxs2.rgb[<span class="dv">2</span>],mcxs2.rgb[<span class="dv">3</span>], <span class="at">alpha=</span><span class="dv">120</span>, <span class="at">maxColorValue=</span><span class="dv">255</span>)</span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Save as pdf</span></span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>), <span class="at">mar=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N){</span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>  ylims     <span class="ot">=</span> <span class="fu">range</span>(IRFs.k1[n,hh],IRFs.k1.hdi[,n,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>],<span class="dv">0</span>)</span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">plot</span>(hh,IRFs.k1[n,hh], <span class="at">type=</span><span class="st">"l"</span>, <span class="at">ylim=</span>ylims, <span class="at">axes=</span><span class="cn">FALSE</span>, <span class="at">xlab=</span><span class="st">""</span>, <span class="at">main=</span><span class="fu">rownames</span>(IRFs.k1)[n])</span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">13</span>,<span class="dv">17</span>),<span class="fu">c</span>(<span class="st">""</span>,<span class="st">"1 quarter"</span>,<span class="st">"1 year"</span>,<span class="st">"6 quarters"</span>, <span class="st">"2 years"</span>, <span class="st">"3 years"</span>, <span class="st">"4 years"</span>))</span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">2</span>,<span class="fu">c</span>(ylims[<span class="dv">1</span>],<span class="dv">0</span>,ylims[<span class="dv">2</span>]),<span class="fu">round</span>(<span class="fu">c</span>(ylims[<span class="dv">1</span>],<span class="dv">0</span>,ylims[<span class="dv">2</span>]),<span class="dv">3</span>))</span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon</span>(<span class="fu">c</span>(hh,(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="dv">1</span>), <span class="fu">c</span>(IRFs.k1.hdi[<span class="dv">1</span>,n,hh],IRFs.k1.hdi[<span class="dv">2</span>,n,(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="dv">1</span>]), <span class="at">col=</span>mcxs1.shade1,<span class="at">border=</span>mcxs1.shade1)</span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">h=</span><span class="dv">0</span>)</span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(hh, IRFs.k1[n,hh],<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span>mcxs1)</span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(<span class="fu">list</span>(p1))</span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Using the <code>plot_irf</code> function, we plot the IRFs given a 25 basis points shock to the Australian Cash Rate below:</p>
 <div class="cell fig-cap-location-top">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>cashrate.irf <span class="ot">=</span> <span class="fu">plot_irf</span>(<span class="dv">5</span>, data.irf_fevd, parameters)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1191,7 +1247,12 @@ x\\
 </div>
 </div>
 </div>
+<p>The last row of plots contain housing variables. We can see that home loan rates move almost in line with the dynamics of the effect of positive domestic monetary policy shock on cash rate itself.</p>
+<p>The number of new homes built increases slightly at the time of the shock but continuously decreases after that reaching a trough in about 1.5 years. It trends upwards after that point but at a much lower rate than at which it dropped.</p>
+<p>The housing price index starts from zero and trends downwards in a concave fashion over time stabilising at a lower level. This implies that a positive monetary shock reduces the House Price Index but that the magnitude of the negative effect increases but stabilises over time.</p>
+<p>Now, we plot the IRFs given a +25 basis points shock to the US federal funds rate.</p>
 <div class="cell fig-cap-location-top">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>usffr.irf <span class="ot">=</span> <span class="fu">plot_irf</span>(<span class="dv">1</span>, data.irf_fevd, parameters)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1201,15 +1262,138 @@ x\\
 </div>
 </div>
 </div>
+<p>Here, we can see that a positive US Federal Funds rate shock affects the home loan rate in a similar way that it affects the RBA target cash rate. The impulse response for home loan rate starts at a small positive value and decreases very gradually over time.</p>
+<p>A positive US Federal Funds rate shock decreases the quantity of new homes. The negative effect peaks within a year and then roughly remains constant thereafter.</p>
+<p>And lastly, a positive US Federal Funds rate shock increases the house price index and that effect roughly stays the same over time.</p>
 <div class="cell">
 
 </div>
 </section>
 <section id="forecast-error-variance-decomposition" class="level3">
 <h3 class="anchored" data-anchor-id="forecast-error-variance-decomposition">Forecast Error Variance Decomposition</h3>
+<p>The <code>plot_fevd</code> function plots the FEVD for a chosen variable using the <code>FEVD.posterior</code> matrices computed by the <code>irf_fevd</code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>plot_fevd <span class="ot">=</span> <span class="cf">function</span>(position, fevd, parameters){</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  FEVD.posterior <span class="ot">=</span> fevd<span class="sc">$</span>FEVD.posterior</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  h <span class="ot">=</span> parameters<span class="sc">$</span>h</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">dim</span>(FEVD.posterior)[<span class="dv">1</span>]</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  ffr.pos <span class="ot">=</span> <span class="fu">which</span>(<span class="fu">colnames</span>(df) <span class="sc">==</span> <span class="st">"US FFR Max Target Rate"</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  cr.pos <span class="ot">=</span> <span class="fu">which</span>(<span class="fu">colnames</span>(df) <span class="sc">==</span> <span class="st">"RBA Target Cash Rate"</span>)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  hh            <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span>(h<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>fevd.mat  <span class="ot">=</span> <span class="fu">apply</span>(FEVD.posterior[position,,,],<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,mean)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>fevd.mat  <span class="ot">=</span> <span class="fu">rbind</span>(<span class="fu">rep</span>(<span class="dv">0</span>,h<span class="sc">+</span><span class="dv">1</span>),<span class="fu">apply</span>(fevd.mat,<span class="dv">2</span>,cumsum))</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"deepskyblue1"</span>,<span class="st">"deepskyblue2"</span>,<span class="st">"deepskyblue"</span>,<span class="st">"deepskyblue3"</span>,<span class="st">"deepskyblue4"</span>,<span class="st">"dodgerblue"</span>,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>           <span class="st">"maroon1"</span>,<span class="st">"maroon"</span>,<span class="st">"maroon2"</span>,<span class="st">"magenta"</span>,<span class="st">"maroon3"</span>,<span class="st">"maroon4"</span>)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">rep</span>(<span class="dv">4</span>,<span class="dv">4</span>),<span class="at">cex.axis=</span><span class="dv">1</span>, <span class="at">cex.lab=</span><span class="fl">0.8</span>)</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">plot</span>(hh,fevd.mat[<span class="dv">1</span>,], <span class="at">type=</span><span class="st">"n"</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>), <span class="at">axes=</span><span class="cn">FALSE</span>, <span class="at">xlab=</span><span class="st">""</span>, <span class="at">ylab=</span><span class="st">""</span>)</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">1</span>,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">13</span>,<span class="dv">17</span>),<span class="fu">c</span>(<span class="st">""</span>,<span class="st">"1 quarter"</span>,<span class="st">"1 year"</span>,<span class="st">"6 quarters"</span>, <span class="st">"2 years"</span>, <span class="st">"3 years"</span>, <span class="st">"4 years"</span>))</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>,<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">50</span>,<span class="dv">100</span>),<span class="fu">c</span>(<span class="st">""</span>,<span class="fu">colnames</span>(df)[position],<span class="st">""</span>))</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N){</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon</span>(<span class="fu">c</span>(hh,(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="dv">1</span>), <span class="fu">c</span>(fevd.mat[n,hh],fevd.mat[n<span class="sc">+</span><span class="dv">1</span>,(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="dv">1</span>]), <span class="at">col=</span>colors[n],<span class="at">border=</span>colors[n])</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">4</span>, (<span class="fl">0.5</span><span class="sc">*</span>(fevd.mat[(<span class="dv">1</span><span class="sc">:</span>N),(h<span class="sc">+</span><span class="dv">1</span>)]<span class="sc">+</span>fevd.mat[<span class="dv">2</span><span class="sc">:</span>(N<span class="sc">+</span><span class="dv">1</span>),(h<span class="sc">+</span><span class="dv">1</span>)]))[<span class="fu">c</span>(ffr.pos,position,cr.pos)], <span class="fu">c</span>(<span class="st">"us.mps"</span>,<span class="st">""</span>,<span class="st">"au.mps"</span>)) <span class="co"># fix position of terms</span></span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(<span class="fu">list</span>(p1))</span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for homeloan rates-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The FEVD graph above shows that the domestic monetary policy shock is very important in explaining the variability in home loan rates. Foreign monetary policy shocks roughly maintain the same level of explanability of the variation in home loan rates. It also indicates that an inflation shock would have an increasing explanatory power over time of home loan rates.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for quantity of new homes-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The FEVD graph above shows that both domestic and foreign monetary policy shock have a greater explanatory power on the variation of the quantity of new homes built over time. It indicates that the effects of these shocks have a long lasting effect and increasing effect on the quantity of homes built.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for house price index-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The FEVD graph above shows that both domestic and foreign monetary policy shock have little explanatory power over the variation in house price index at time <span class="math inline">\(t\)</span> but that this power increases over time. This also indicates that the effects of these shocks have a long lasting effect and increasing effect on house prices.</p>
+</section>
+</section>
+<section id="extended-model-1" class="level2">
+<h2 class="anchored" data-anchor-id="extended-model-1">Extended Model</h2>
 <div class="cell">
 
 </div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<section id="impulse-response-functions" class="level3">
+<h3 class="anchored" data-anchor-id="impulse-response-functions">Impulse response functions</h3>
+<p>For the extended model, using the <code>plot_irf</code> function, we plot the IRFs to a +25 basis points increase in the Australian Cash Rate.</p>
+<div class="cell fig-cap-location-top">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/ext.cashrate.irf-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">IRF plots for the AU Cash Rate Shock, Extended Model</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The IRF results are different compared to the baseline results. The effect of a positive domestic monetary policy shock on home loan rates seems to be more persistent as the effect erodes away at a much lower rate.</p>
+<p>The quantity of new homes built is the qualitatively the same as under the baseline specification, except for the absence of an initial boost in the number of houses built. Quantitatively, the negative effect on quantity of new homes is much lower under this specification.</p>
+<p>House price index results are also qualitatively the same as under the baseline specification. However, the magnitude of the reduction in house prices due to a positive monetary policy shock is also lower than under the baseline specification.</p>
+<p>For the extended model, using the <code>plot_irf</code> function, we plot the IRFs to a +25 basis points increase in the US Federal Funds Rate.</p>
+<div class="cell fig-cap-location-top">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/ext.usffr.irf-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">IRF plots for the US Federal Funds Rate Shock, Extended Model</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The effect of a positive foreign monetary policy shock on home loan rates appears both qualitatively and quantitatively similar as under the baseline specification.</p>
+<p>However, the effect of a positive foreign monetary policy shock on quantity of homes is different. There is an immediate positive increase in the number of new homes, but this effect linearly goes dissipates away returning to zero after around 3 years.</p>
+<p>The effect on house price index is similar as under the baseline specification where a postive USFFR shock increases house price index slightly and keeps them at that level.</p>
+</section>
+<section id="forecast-error-variance-decomposition-1" class="level3">
+<h3 class="anchored" data-anchor-id="forecast-error-variance-decomposition-1">Forecast Error Variance Decomposition</h3>
+<p>In the figures below, we plot the FEVDs for our selected housing variables of interest.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for homeloan rates, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The FEVD graph above shows that the domestic monetary policy shock carries the bulk of the explanatory power in the variability of home loan rates. Compared to the baseline model, the shocks on real economy variables (GDP, consumption) are even less important (and carry virtually no explanatory power) while the change in CPI also become less important.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for quantity of new homes, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The FEVD graph above shows that while both domestic and foreign monetary policy have little explanatory power on the variability of the quantity of new homes built, the power increases over time. However, this increase in explanatory power is lower than in the baseline model. Moreover, shocks on the real economic indicators (GDP, consumption) are relatively more important while change in inflation is less important in explaining the variability of the quantity of new homes.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for house price index, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Under the extended model specification, the domestic monetary policy shock appears less important, whereas the home loan rate shock becomes much more important in explaining the variability in house price index.</p>
+</section>
+</section>
+</section>
+<section id="appendix" class="level1">
+<h1>Appendix</h1>
+<div class="cell" data-file="L16 codes.R">
+
+</div>
+<section id="baseline-model-2" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model-2">Baseline Model</h2>
+<section id="forecast-error-variance-decomposition-fevd" class="level3">
+<h3 class="anchored" data-anchor-id="forecast-error-variance-decomposition-fevd">Forecast Error Variance Decomposition (FEVD)</h3>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/fevd for nominal gdp-1.png" class="img-fluid" width="672"></p>
@@ -1232,21 +1416,6 @@ x\\
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/fevd for quantity of new homes-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/fevd for house price index-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/fevd for homeloan rates-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
 <p><img src="index_files/figure-html/fevd for cashrate-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
@@ -1259,43 +1428,8 @@ x\\
 
 </div>
 </section>
-</section>
-<section id="extended-model-1" class="level2">
-<h2 class="anchored" data-anchor-id="extended-model-1">Extended Model</h2>
-<div class="cell">
-
-</div>
-<div class="cell">
-
-</div>
-<div class="cell">
-
-</div>
-<section id="impulse-response-functions" class="level3">
-<h3 class="anchored" data-anchor-id="impulse-response-functions">Impulse response functions</h3>
-<div class="cell fig-cap-location-top">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="index_files/figure-html/ext.cashrate.irf-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">IRF plots for the AU Cash Rate Shock, Extended Model</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell fig-cap-location-top">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="index_files/figure-html/ext.usffr.irf-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">IRF plots for the US Federal Funds Rate Shock, Extended Model</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="forecast-error-variance-decomposition-1" class="level3">
-<h3 class="anchored" data-anchor-id="forecast-error-variance-decomposition-1">Forecast Error Variance Decomposition</h3>
+<section id="extended-model-2" class="level3">
+<h3 class="anchored" data-anchor-id="extended-model-2">Extended Model</h3>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/fevd for nominal gdp, extended model-1.png" class="img-fluid" width="672"></p>
@@ -1318,21 +1452,6 @@ x\\
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/fevd for quantity of new homes, extended model-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/fevd for house price index, extended model-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/fevd for homeloan rates, extended model-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
 <p><img src="index_files/figure-html/fevd for cashrate, extended model-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
@@ -1346,12 +1465,6 @@ x\\
 </div>
 </section>
 </section>
-</section>
-<section id="appendix" class="level1">
-<h1>Appendix</h1>
-<div class="cell" data-file="L16 codes.R">
-
-</div>
 </section>
 <section id="references" class="level1 unnumbered">
 

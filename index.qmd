@@ -390,7 +390,7 @@ B0Vlist       = list(B0.initial = B0.initial, V = BM.V)
 ```
 
 
-## Basic Model
+## Baseline Model
 ### Prior distribution
 Given this parameterisation, we can write down the kernel of the **prior** given hyperparameters $(\underline B, \underline \Omega, \underline S, \underline \nu)$ as follows:
 $$ 
@@ -1010,6 +1010,9 @@ ext.data_kappap = pmatrix(ext.struct.means$kappap)
 ```
 
 # Empirical Investigation
+In this section, I explore how the variables in my data respond to a domestic monetary policy shock (i.e. a 25 basis points cash rate shock) and a foreign monetary policy shock (i.e. a 25 basis points US Federal Funds Rate shock) using Impulse Response Function (IRF) graphs. I also plot the Forecast Error Variance Decomposition (FEVD) plots to illustrate what extent of the variability of my variables are explained by the structural shocks the model, and how these explainability evolves over time.
+
+The `irf_fevd` function below computes and stores the posterior IRF and FEVD values for each variable and each shock. The implementation follows closely from [Tomasz Woźniak](https://github.com/donotdespair)'s lecture notes.
 
 ```{r  function to compute the irf and fevd matrices, echo=TRUE}
 irf_fevd = function(parameters, usedata, Bposteriors){
@@ -1059,6 +1062,7 @@ list(IRF.posterior = IRF.posterior, IRF.inf.posterior= IRF.inf.posterior, FEVD.p
 }
 ```
 
+The next two subsections plot and explain the IRFs and selected FEVDs for the baseline and the extended model respectively.
 
 ## Baseline Model
 
@@ -1076,7 +1080,8 @@ load("data.irf_fevd.RData")
 
 ### Impulse Response Functions (IRFs)
 
-```{r  function that plots the irf of chosen variable position}
+The `plot_irf` function plots the IRF of all variables given the position of the structural shock. 
+```{r  function that plots the irf of chosen variable position, echo=TRUE}
 plot_irf = function(position, fevd, parameters){
   # Unpack results
 IRF.posterior = fevd$IRF.posterior
@@ -1123,19 +1128,33 @@ return(list(p1))
 }
 ```
 
-```{r irf of cashrate}
+Using the `plot_irf` function, we plot the IRFs given a 25 basis points shock to the Australian Cash Rate below:
+```{r irf of cashrate, echo=TRUE}
 #| label: cashrate.irf
 #| fig-cap: "IRF plots for the AU Cash Rate Shock"
 #| fig-cap-location: top
 cashrate.irf = plot_irf(5, data.irf_fevd, parameters)
 ```
+The last row of plots contain housing variables. We can see that home loan rates move almost in line with the dynamics of the effect of positive domestic monetary policy shock on cash rate itself. 
 
-```{r irf of usffr}
+The number of new homes built increases slightly at the time of the shock but continuously decreases after that reaching a trough in about 1.5 years. It trends upwards after that point but at a much lower rate than at which it dropped.
+
+The housing price index starts from zero and trends downwards in a concave fashion over time stabilising at a lower level. This implies that a positive monetary shock reduces the House Price Index but that the magnitude of the negative effect increases but stabilises over time.
+
+
+Now, we plot the IRFs given a +25 basis points shock to the US federal funds rate.
+```{r irf of usffr, echo=TRUE}
 #| label: usffr.irf
 #| fig-cap: "IRF plots for the US Federal Funds Rate Shock"
 #| fig-cap-location: top
 usffr.irf = plot_irf(1, data.irf_fevd, parameters)
 ```
+
+Here, we can see that a positive US Federal Funds rate shock affects the home loan rate in a similar way that it affects the RBA target cash rate. The impulse response for home loan rate starts at a small positive value and decreases very gradually over time. 
+
+A positive US Federal Funds rate shock decreases the quantity of new homes. The negative effect peaks within a year and then roughly remains constant thereafter.
+
+And lastly, a positive US Federal Funds rate shock increases the house price index and that effect roughly stays the same over time.
 
 ```{r save the irf figures as pdf, eval=FALSE}
 pdf(file = "aucr_irf.pdf", onefile = FALSE, width = 16, height = 9)
@@ -1147,10 +1166,10 @@ plot_irf(4, data.irf_fevd, parameters)
 dev.off()
 ```
 
-
 ### Forecast Error Variance Decomposition
 
-```{r function to plot the fevd of variables given position}
+The `plot_fevd` function plots the FEVD for a chosen variable using the `FEVD.posterior` matrices computed by the `irf_fevd` function. 
+```{r function to plot the fevd of variables given position, echo=TRUE}
 plot_fevd = function(position, fevd, parameters){
   FEVD.posterior = fevd$FEVD.posterior
   h = parameters$h
@@ -1178,6 +1197,106 @@ return(list(p1))
 }
 ```
 
+
+```{r fevd for homeloan rates, warning=FALSE}
+variable.choice = "Owner-occupied home loan rates"
+position = which(colnames(df) == variable.choice)
+hlr.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+The FEVD graph above shows that the domestic monetary policy shock is very important in explaining the variability in home loan rates. Foreign monetary policy shocks roughly maintain the same level of explanability of the variation in home loan rates. It also indicates that an inflation shock would have an increasing explanatory power over time of home loan rates.
+
+
+```{r fevd for quantity of new homes}
+variable.choice = "Quantity of new homes (log)"
+position = which(colnames(df) == variable.choice)
+nh.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+
+The FEVD graph above shows that both domestic and foreign monetary policy shock have a greater explanatory power on the variation of the quantity of new homes built over time. It indicates that the effects of these shocks have a long lasting effect and increasing effect on the quantity of homes built.
+
+```{r fevd for house price index}
+variable.choice = "House Price Index (log)"
+position = which(colnames(df) == variable.choice)
+hpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
+```
+The FEVD graph above shows that both domestic and foreign monetary policy shock have little explanatory power over the variation in house price index at time $t$ but that this power increases over time. This also indicates that the effects of these shocks have a long lasting effect and increasing effect on house prices.
+
+## Extended Model
+```{r compute the irf and fevd results for data in extended model, eval=FALSE}
+ext.data.irf_fevd = irf_fevd(parameters, mydata, ext.struct)
+```
+
+```{r save the irf and fevd results for data in extended model, eval=FALSE}
+save(ext.data.irf_fevd, file = "ext.data.irf_fevd.RData")
+```
+
+```{r load the irf and fevd results for data in extended model, eval=TRUE}
+load("ext.data.irf_fevd.RData")
+```
+
+### Impulse response functions
+For the extended model, using the `plot_irf` function, we plot the IRFs to a +25 basis points increase in the Australian Cash Rate.
+```{r irf of cashrate, extended model}
+#| label: ext.cashrate.irf
+#| fig-cap: "IRF plots for the AU Cash Rate Shock, Extended Model"
+#| fig-cap-location: top
+ext.cashrate.irf = plot_irf(5, ext.data.irf_fevd, parameters)
+```
+The IRF results are different compared to the baseline results. The effect of a positive domestic monetary policy shock on home loan rates seems to be more persistent as the effect erodes away at a much lower rate.
+
+The quantity of new homes built is the qualitatively the same as under the baseline specification, except for the absence of an initial boost in the number of houses built. Quantitatively, the negative effect on quantity of new homes is much lower under this specification.
+
+House price index results are also qualitatively the same as under the baseline specification. However, the magnitude of the reduction in house prices due to a positive monetary policy shock is also lower than under the baseline specification.
+
+
+For the extended model, using the `plot_irf` function, we plot the IRFs to a +25 basis points increase in the US Federal Funds Rate.
+```{r irf of usffr, extended model}
+#| label: ext.usffr.irf
+#| fig-cap: "IRF plots for the US Federal Funds Rate Shock, Extended Model"
+#| fig-cap-location: top
+ext.usffr.irf = plot_irf(1, ext.data.irf_fevd, parameters)
+```
+
+The effect of a positive foreign monetary policy shock on home loan rates appears both qualitatively and quantitatively similar as under the baseline specification.
+
+However, the effect of a positive foreign monetary policy shock on quantity of homes is different. There is an immediate positive increase in the number of new homes, but this effect linearly goes dissipates away returning to zero after around 3 years.
+
+The effect on house price index is similar as under the baseline specification where a postive USFFR shock increases house price index slightly and keeps them at that level.
+
+### Forecast Error Variance Decomposition
+
+In the figures below, we plot the FEVDs for our selected housing variables of interest.
+
+```{r fevd for homeloan rates, extended model, warning=FALSE}
+variable.choice = "Owner-occupied home loan rates"
+position = which(colnames(df) == variable.choice)
+ext.hlr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+The FEVD graph above shows that the domestic monetary policy shock carries the bulk of the explanatory power in the variability of home loan rates. Compared to the baseline model, the shocks on real economy variables (GDP, consumption) are even less important (and carry virtually no explanatory power) while the change in CPI also become less important.
+
+```{r fevd for quantity of new homes, extended model}
+variable.choice = "Quantity of new homes (log)"
+position = which(colnames(df) == variable.choice)
+ext.nh.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+The FEVD graph above shows that while both domestic and foreign monetary policy have little explanatory power on the variability of the quantity of new homes built, the power increases over time. However, this increase in explanatory power is lower than in the baseline model. Moreover, shocks on the real economic indicators (GDP, consumption) are relatively more important while change in inflation is less important in explaining the variability of the quantity of new homes.
+
+```{r fevd for house price index, extended model}
+variable.choice = "House Price Index (log)"
+position = which(colnames(df) == variable.choice)
+ext.hpi.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+Under the extended model specification, the domestic monetary policy shock appears less important, whereas the home loan rate shock becomes much more important in explaining the variability in house price index. 
+
+# Appendix {#appendix}
+```{r, file="L16 codes.R"}
+```
+
+## Baseline Model
+### Forecast Error Variance Decomposition (FEVD)
 ```{r fevd for nominal gdp}
 variable.choice = "Nominal GDP (log)"
 position = which(colnames(df) == variable.choice)
@@ -1200,24 +1319,6 @@ cpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
 variable.choice = "US FFR Max Target Rate"
 position = which(colnames(df) == variable.choice)
 usffr.fevd = plot_fevd(position, data.irf_fevd, parameters)
-```
-
-```{r fevd for quantity of new homes}
-variable.choice = "Quantity of new homes (log)"
-position = which(colnames(df) == variable.choice)
-nh.fevd = plot_fevd(position, data.irf_fevd, parameters)
-```
-
-```{r fevd for house price index}
-variable.choice = "House Price Index (log)"
-position = which(colnames(df) == variable.choice)
-hpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
-```
-
-```{r fevd for homeloan rates, warning=FALSE}
-variable.choice = "Owner-occupied home loan rates"
-position = which(colnames(df) == variable.choice)
-hlr.fevd = plot_fevd(position, data.irf_fevd, parameters)
 ```
 
 ```{r fevd for cashrate, warning=FALSE}
@@ -1246,36 +1347,7 @@ fevd.plots = c("usffr.fevd", "gdp.fevd", "con.fevd", "cpi.fevd", "aucr.fevd", "m
 
 ```
 
-## Extended Model
-```{r compute the irf and fevd results for data in extended model, eval=FALSE}
-ext.data.irf_fevd = irf_fevd(parameters, mydata, ext.struct)
-```
-
-```{r save the irf and fevd results for data in extended model, eval=FALSE}
-save(ext.data.irf_fevd, file = "ext.data.irf_fevd.RData")
-```
-
-```{r load the irf and fevd results for data in extended model, eval=TRUE}
-load("ext.data.irf_fevd.RData")
-```
-
-### Impulse response functions
-
-```{r irf of cashrate, extended model}
-#| label: ext.cashrate.irf
-#| fig-cap: "IRF plots for the AU Cash Rate Shock, Extended Model"
-#| fig-cap-location: top
-ext.cashrate.irf = plot_irf(5, ext.data.irf_fevd, parameters)
-```
-
-```{r irf of usffr, extended model}
-#| label: ext.usffr.irf
-#| fig-cap: "IRF plots for the US Federal Funds Rate Shock, Extended Model"
-#| fig-cap-location: top
-ext.usffr.irf = plot_irf(1, ext.data.irf_fevd, parameters)
-```
-
-### Forecast Error Variance Decomposition
+### Extended Model
 ```{r fevd for nominal gdp, extended model}
 variable.choice = "Nominal GDP (log)"
 position = which(colnames(df) == variable.choice)
@@ -1300,23 +1372,6 @@ position = which(colnames(df) == variable.choice)
 ext.usffr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
 ```
 
-```{r fevd for quantity of new homes, extended model}
-variable.choice = "Quantity of new homes (log)"
-position = which(colnames(df) == variable.choice)
-ext.nh.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
-```
-
-```{r fevd for house price index, extended model}
-variable.choice = "House Price Index (log)"
-position = which(colnames(df) == variable.choice)
-ext.hpi.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
-```
-
-```{r fevd for homeloan rates, extended model, warning=FALSE}
-variable.choice = "Owner-occupied home loan rates"
-position = which(colnames(df) == variable.choice)
-ext.hlr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
-```
 
 ```{r fevd for cashrate, extended model, warning=FALSE}
 variable.choice = "RBA Target Cash Rate"
@@ -1331,7 +1386,6 @@ position = which(colnames(df) == variable.choice)
 ext.m1.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
 ```
 
-
 ```{r save fevd figures in a single plot for extended model, eval=FALSE}
 fevd.plots = c("ext.usffr.fevd", "ext.gdp.fevd", "ext.con.fevd", "ext.cpi.fevd", "ext.aucr.fevd", "ext.m1.fevd", "ext.hlr.fevd", "ext.nh.fevd", "ext.hpi.fevd")
   # Save each plot as an EPS file
@@ -1343,10 +1397,6 @@ fevd.plots = c("ext.usffr.fevd", "ext.gdp.fevd", "ext.con.fevd", "ext.cpi.fevd",
   }
 
 ```
-# Appendix {#appendix}
-```{r, file="L16 codes.R"}
-```
-
 
 # References {.unnumbered}
 
