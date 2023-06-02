@@ -209,8 +209,16 @@ div.csl-indent {
   </ul></li>
   <li><a href="#empirical-investigation" id="toc-empirical-investigation" class="nav-link" data-scroll-target="#empirical-investigation">Empirical Investigation</a>
   <ul class="collapse">
+  <li><a href="#baseline-model" id="toc-baseline-model" class="nav-link" data-scroll-target="#baseline-model">Baseline Model</a>
+  <ul class="collapse">
   <li><a href="#impulse-response-functions-irfs" id="toc-impulse-response-functions-irfs" class="nav-link" data-scroll-target="#impulse-response-functions-irfs">Impulse Response Functions (IRFs)</a></li>
   <li><a href="#forecast-error-variance-decomposition" id="toc-forecast-error-variance-decomposition" class="nav-link" data-scroll-target="#forecast-error-variance-decomposition">Forecast Error Variance Decomposition</a></li>
+  </ul></li>
+  <li><a href="#extended-model-1" id="toc-extended-model-1" class="nav-link" data-scroll-target="#extended-model-1">Extended Model</a>
+  <ul class="collapse">
+  <li><a href="#impulse-response-functions" id="toc-impulse-response-functions" class="nav-link" data-scroll-target="#impulse-response-functions">Impulse response functions</a></li>
+  <li><a href="#forecast-error-variance-decomposition-1" id="toc-forecast-error-variance-decomposition-1" class="nav-link" data-scroll-target="#forecast-error-variance-decomposition-1">Forecast Error Variance Decomposition</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -901,9 +909,9 @@ B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    kappa0[<span class="dv">1</span>] <span class="ot">=</span> <span class="dv">10</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    kappap <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>, S)</span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    kappap[<span class="dv">1</span>] <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    B0.post <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(usedata<span class="sc">$</span>N,usedata<span class="sc">$</span>N,S))</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    Bp.post <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(usedata<span class="sc">$</span>N,usedata<span class="sc">$</span>K,S))</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">kappa0 =</span> kappa0, <span class="at">kappap =</span> kappap, <span class="at">B0.post =</span> B0.post, <span class="at">Bp.post =</span> Bp.post)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    B0.posterior <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(usedata<span class="sc">$</span>N,usedata<span class="sc">$</span>N,S))</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    Bp.posterior <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(usedata<span class="sc">$</span>N,usedata<span class="sc">$</span>K,S))</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">kappa0 =</span> kappa0, <span class="at">kappap =</span> kappap, <span class="at">B0.posterior =</span> B0.posterior, <span class="at">Bp.posterior =</span> Bp.posterior)</span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -935,8 +943,8 @@ B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
 <span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  B0.norm.i <span class="ot">=</span> <span class="fu">normalize.Gibbs.output.parallel</span>(B0.i, B0.hat)</span>
 <span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  Bp.i <span class="ot">=</span> <span class="fu">rnorm.ngn</span>(B0.norm.i, B.post, Omega.post)</span>
 <span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>B0.post[,,i] <span class="ot">=</span> B0.norm.i</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>Bp.post[,,i] <span class="ot">=</span> Bp.i</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>B0.posterior[,,i] <span class="ot">=</span> B0.norm.i</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>Bp.posterior[,,i] <span class="ot">=</span> Bp.i</span>
 <span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Now, update kappa</span></span>
 <span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>  kappa0.nu.post <span class="ot">=</span> priors<span class="sc">$</span>kappa0.nu <span class="sc">+</span> (usedata<span class="sc">$</span>N<span class="sc">/</span><span class="dv">2</span>)</span>
@@ -957,8 +965,8 @@ B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
 <span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>kappa0 <span class="ot">=</span> struct<span class="sc">$</span>kappa0[(parameters<span class="sc">$</span>S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(parameters<span class="sc">$</span>S.burnin <span class="sc">+</span> parameters<span class="sc">$</span>S)]</span>
 <span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>kappap <span class="ot">=</span> struct<span class="sc">$</span>kappap[(parameters<span class="sc">$</span>S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(parameters<span class="sc">$</span>S.burnin <span class="sc">+</span> parameters<span class="sc">$</span>S)]</span>
-<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>B0.post <span class="ot">=</span> struct<span class="sc">$</span>B0.post[,,(parameters<span class="sc">$</span>S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(parameters<span class="sc">$</span>S.burnin <span class="sc">+</span> parameters<span class="sc">$</span>S)]</span>
-<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>Bp.post <span class="ot">=</span> struct<span class="sc">$</span>Bp.post[,,(parameters<span class="sc">$</span>S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(parameters<span class="sc">$</span>S.burnin <span class="sc">+</span> parameters<span class="sc">$</span>S)]</span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>B0.posterior <span class="ot">=</span> struct<span class="sc">$</span>B0.posterior[,,(parameters<span class="sc">$</span>S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(parameters<span class="sc">$</span>S.burnin <span class="sc">+</span> parameters<span class="sc">$</span>S)]</span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>  struct<span class="sc">$</span>Bp.posterior <span class="ot">=</span> struct<span class="sc">$</span>Bp.posterior[,,(parameters<span class="sc">$</span>S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(parameters<span class="sc">$</span>S.burnin <span class="sc">+</span> parameters<span class="sc">$</span>S)]</span>
 <span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(struct)</span>
 <span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -968,8 +976,8 @@ B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  struct.means <span class="ot">=</span> <span class="fu">list</span>(</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">kappa0 =</span> <span class="fu">mean</span>(struct<span class="sc">$</span>kappa0),</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">kappap =</span> <span class="fu">mean</span>(struct<span class="sc">$</span>kappap),</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">B0 =</span> <span class="fu">rowMeans</span>(struct<span class="sc">$</span>B0.post, <span class="at">dims =</span> <span class="dv">2</span>),</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Bp =</span> <span class="fu">rowMeans</span>(struct<span class="sc">$</span>Bp.post, <span class="at">dims =</span> <span class="dv">2</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">B0 =</span> <span class="fu">rowMeans</span>(struct<span class="sc">$</span>B0.posterior, <span class="at">dims =</span> <span class="dv">2</span>),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Bp =</span> <span class="fu">rowMeans</span>(struct<span class="sc">$</span>Bp.posterior, <span class="at">dims =</span> <span class="dv">2</span>)</span>
 <span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -998,8 +1006,8 @@ B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
 <p><span class="math display">\[\begin{equation*}
 \left(
 \begin{array}{cc}
-1.0033946 &amp; 0.0000000\\
--0.0352557 &amp; 0.9969687\\
+1.0031219 &amp; 0.0000000\\
+-0.0354609 &amp; 0.9974601\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -1008,8 +1016,8 @@ B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
 <p><span class="math display">\[\begin{equation*}
 \left(
 \begin{array}{ccc}
-0.0185505 &amp; 1.0000765 &amp; -0.0061724\\
--0.0117360 &amp; -0.0419334 &amp; 0.9844710\\
+0.0194938 &amp; 0.9996890 &amp; -0.0063959\\
+-0.0120185 &amp; -0.0422528 &amp; 0.9847704\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -1020,7 +1028,7 @@ B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
 \begin{array}{c}
 x\\
 \hline
-7.769759\\
+12.17841\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -1031,7 +1039,7 @@ x\\
 \begin{array}{c}
 x\\
 \hline
-0.0001251\\
+0.0001206\\
 \end{array}
 \right)\, .
 \end{equation*}\]</span></p>
@@ -1110,8 +1118,6 @@ x\\
 </section>
 <section id="empirical-investigation" class="level1">
 <h1>Empirical Investigation</h1>
-<section id="impulse-response-functions-irfs" class="level2">
-<h2 class="anchored" data-anchor-id="impulse-response-functions-irfs">Impulse Response Functions (IRFs)</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>irf_fevd <span class="ot">=</span> <span class="cf">function</span>(parameters, usedata, Bposteriors){</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Unpack variables</span></span>
@@ -1124,17 +1130,17 @@ x\\
 <span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  Bp.posterior <span class="ot">=</span> Bposteriors<span class="sc">$</span>Bp.posterior</span>
 <span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  B.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,S))</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>A.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,K,S))</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  A.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,K,S))</span>
 <span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  B               <span class="ot">=</span> <span class="fu">solve</span>(B0.posterior[,,s])</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  B.posterior[,,s]<span class="ot">=</span> B</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  A.posterior[,,s]<span class="ot">=</span> B <span class="sc">%*%</span> Bp.posterior[,,s]</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  B                 <span class="ot">=</span> <span class="fu">solve</span>(B0.posterior[,,s])</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  B.posterior[,,s]  <span class="ot">=</span> B</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  A.posterior[,,s]  <span class="ot">=</span> B <span class="sc">%*%</span> Bp.posterior[,,s]</span>
 <span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>IRF.posterior     <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,h<span class="sc">+</span><span class="dv">1</span>,S))</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>IRF.inf.posterior <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,S))</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>FEVD.posterior    <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,h<span class="sc">+</span><span class="dv">1</span>,S))</span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>J                 <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">diag</span>(N),<span class="fu">matrix</span>(<span class="dv">0</span>,N,N<span class="sc">*</span>(p<span class="dv">-1</span>)))</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>IRF.posterior       <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,h<span class="sc">+</span><span class="dv">1</span>,S))</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>IRF.inf.posterior   <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,S))</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>FEVD.posterior      <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,h<span class="sc">+</span><span class="dv">1</span>,S))</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>J                   <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">diag</span>(N),<span class="fu">matrix</span>(<span class="dv">0</span>,N,N<span class="sc">*</span>(p<span class="dv">-1</span>)))</span>
 <span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
 <span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>  A.bold          <span class="ot">=</span> <span class="fu">rbind</span>(A.posterior[,<span class="dv">2</span><span class="sc">:</span>(<span class="dv">1</span><span class="sc">+</span>N<span class="sc">*</span>p),s],<span class="fu">cbind</span>(<span class="fu">diag</span>(N<span class="sc">*</span>(p<span class="dv">-1</span>)),<span class="fu">matrix</span>(<span class="dv">0</span>,N<span class="sc">*</span>(p<span class="dv">-1</span>),N)))</span>
 <span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>  IRF.inf.posterior[,,s]          <span class="ot">=</span> J <span class="sc">%*%</span> <span class="fu">solve</span>(<span class="fu">diag</span>(N<span class="sc">*</span>p)<span class="sc">-</span>A.bold) <span class="sc">%*%</span> <span class="fu">t</span>(J) <span class="sc">%*%</span> B.posterior[,,s]</span>
@@ -1159,6 +1165,8 @@ x\\
 <span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(<span class="at">IRF.posterior =</span> IRF.posterior, <span class="at">IRF.inf.posterior=</span> IRF.inf.posterior, <span class="at">FEVD.posterior =</span> FEVD.posterior)</span>
 <span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<section id="baseline-model" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model">Baseline Model</h2>
 <div class="cell">
 
 </div>
@@ -1168,6 +1176,8 @@ x\\
 <div class="cell">
 
 </div>
+<section id="impulse-response-functions-irfs" class="level3">
+<h3 class="anchored" data-anchor-id="impulse-response-functions-irfs">Impulse Response Functions (IRFs)</h3>
 <div class="cell">
 
 </div>
@@ -1195,8 +1205,8 @@ x\\
 
 </div>
 </section>
-<section id="forecast-error-variance-decomposition" class="level2">
-<h2 class="anchored" data-anchor-id="forecast-error-variance-decomposition">Forecast Error Variance Decomposition</h2>
+<section id="forecast-error-variance-decomposition" class="level3">
+<h3 class="anchored" data-anchor-id="forecast-error-variance-decomposition">Forecast Error Variance Decomposition</h3>
 <div class="cell">
 
 </div>
@@ -1248,6 +1258,93 @@ x\\
 <div class="cell">
 
 </div>
+</section>
+</section>
+<section id="extended-model-1" class="level2">
+<h2 class="anchored" data-anchor-id="extended-model-1">Extended Model</h2>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<section id="impulse-response-functions" class="level3">
+<h3 class="anchored" data-anchor-id="impulse-response-functions">Impulse response functions</h3>
+<div class="cell fig-cap-location-top">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/ext.cashrate.irf-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">IRF plots for the AU Cash Rate Shock, Extended Model</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell fig-cap-location-top">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/ext.usffr.irf-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">IRF plots for the US Federal Funds Rate Shock, Extended Model</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="forecast-error-variance-decomposition-1" class="level3">
+<h3 class="anchored" data-anchor-id="forecast-error-variance-decomposition-1">Forecast Error Variance Decomposition</h3>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for nominal gdp, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for consumption, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for change in cpi, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for usffr, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for quantity of new homes, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for house price index, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for homeloan rates, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for cashrate, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/fevd for m1, extended model-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+
+</div>
+</section>
 </section>
 </section>
 <section id="appendix" class="level1">

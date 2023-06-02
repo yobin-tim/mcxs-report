@@ -845,9 +845,9 @@ The `init.struct` function creates and initialise a list that contains matrices 
     kappa0[1] = 10
     kappap = rep(NA, S)
     kappap[1] = 10
-    B0.post = array(NA, c(usedata$N,usedata$N,S))
-    Bp.post = array(NA, c(usedata$N,usedata$K,S))
-    list(kappa0 = kappa0, kappap = kappap, B0.post = B0.post, Bp.post = Bp.post)
+    B0.posterior = array(NA, c(usedata$N,usedata$N,S))
+    Bp.posterior = array(NA, c(usedata$N,usedata$K,S))
+    list(kappa0 = kappa0, kappap = kappap, B0.posterior = B0.posterior, Bp.posterior = Bp.posterior)
   }
 ```
 
@@ -879,8 +879,8 @@ ext.sampling = function(parameters, struct, priors, usedata){
   B0.norm.i = normalize.Gibbs.output.parallel(B0.i, B0.hat)
   Bp.i = rnorm.ngn(B0.norm.i, B.post, Omega.post)
   
-  struct$B0.post[,,i] = B0.norm.i
-  struct$Bp.post[,,i] = Bp.i
+  struct$B0.posterior[,,i] = B0.norm.i
+  struct$Bp.posterior[,,i] = Bp.i
   
   # Now, update kappa
   kappa0.nu.post = priors$kappa0.nu + (usedata$N/2)
@@ -901,8 +901,8 @@ ext.sampling = function(parameters, struct, priors, usedata){
   }
   struct$kappa0 = struct$kappa0[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
   struct$kappap = struct$kappap[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
-  struct$B0.post = struct$B0.post[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
-  struct$Bp.post = struct$Bp.post[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$B0.posterior = struct$B0.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$Bp.posterior = struct$Bp.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
   return(struct)
   
 }
@@ -914,8 +914,8 @@ structPosteriorMeans = function(struct){
   struct.means = list(
   kappa0 = mean(struct$kappa0),
   kappap = mean(struct$kappap),
-  B0 = rowMeans(struct$B0.post, dims = 2),
-  Bp = rowMeans(struct$Bp.post, dims = 2)
+  B0 = rowMeans(struct$B0.posterior, dims = 2),
+  Bp = rowMeans(struct$Bp.posterior, dims = 2)
   )
 }
 ```
@@ -1011,7 +1011,6 @@ ext.data_kappap = pmatrix(ext.struct.means$kappap)
 
 # Empirical Investigation
 
-## Impulse Response Functions (IRFs)
 ```{r  function to compute the irf and fevd matrices, echo=TRUE}
 irf_fevd = function(parameters, usedata, Bposteriors){
   # Unpack variables
@@ -1024,17 +1023,17 @@ irf_fevd = function(parameters, usedata, Bposteriors){
   Bp.posterior = Bposteriors$Bp.posterior
   
   B.posterior       = array(NA,c(N,N,S))
-A.posterior       = array(NA,c(N,K,S))
+  A.posterior       = array(NA,c(N,K,S))
 for (s in 1:S){
-  B               = solve(B0.posterior[,,s])
-  B.posterior[,,s]= B
-  A.posterior[,,s]= B %*% Bp.posterior[,,s]
+  B                 = solve(B0.posterior[,,s])
+  B.posterior[,,s]  = B
+  A.posterior[,,s]  = B %*% Bp.posterior[,,s]
 }
 
-IRF.posterior     = array(NA,c(N,N,h+1,S))
-IRF.inf.posterior = array(NA,c(N,N,S))
-FEVD.posterior    = array(NA,c(N,N,h+1,S))
-J                 = cbind(diag(N),matrix(0,N,N*(p-1)))
+IRF.posterior       = array(NA,c(N,N,h+1,S))
+IRF.inf.posterior   = array(NA,c(N,N,S))
+FEVD.posterior      = array(NA,c(N,N,h+1,S))
+J                   = cbind(diag(N),matrix(0,N,N*(p-1)))
 for (s in 1:S){
   A.bold          = rbind(A.posterior[,2:(1+N*p),s],cbind(diag(N*(p-1)),matrix(0,N*(p-1),N)))
   IRF.inf.posterior[,,s]          = J %*% solve(diag(N*p)-A.bold) %*% t(J) %*% B.posterior[,,s]
@@ -1060,6 +1059,9 @@ list(IRF.posterior = IRF.posterior, IRF.inf.posterior= IRF.inf.posterior, FEVD.p
 }
 ```
 
+
+## Baseline Model
+
 ```{r compute the irf and fevd results for data, eval=FALSE}
 data.irf_fevd = irf_fevd(parameters, mydata, Bposteriors)
 ```
@@ -1072,6 +1074,7 @@ save(data.irf_fevd, file = "data.irf_fevd.RData")
 load("data.irf_fevd.RData")
 ```
 
+### Impulse Response Functions (IRFs)
 
 ```{r  function that plots the irf of chosen variable position}
 plot_irf = function(position, fevd, parameters){
@@ -1145,7 +1148,7 @@ dev.off()
 ```
 
 
-## Forecast Error Variance Decomposition
+### Forecast Error Variance Decomposition
 
 ```{r function to plot the fevd of variables given position}
 plot_fevd = function(position, fevd, parameters){
@@ -1232,7 +1235,7 @@ m1.fevd = plot_fevd(position, data.irf_fevd, parameters)
 
 
 ```{r save fevd figures in a single plot, eval=FALSE}
-fevd.plots = c("gdp.fevd", "con.fevd", "cpi.fevd", "usffr.fevd", "nh.fevd", "hpi.fevd", "hlr.fevd", "aucr.fevd", "m1.fevd")
+fevd.plots = c("usffr.fevd", "gdp.fevd", "con.fevd", "cpi.fevd", "aucr.fevd", "m1.fevd", "hlr.fevd", "nh.fevd", "hpi.fevd")
   # Save each plot as an EPS file
   for (i in 1:length(fevd.plots)) {
     filename <- paste0(fevd.plots[i], ".pdf")
@@ -1243,8 +1246,103 @@ fevd.plots = c("gdp.fevd", "con.fevd", "cpi.fevd", "usffr.fevd", "nh.fevd", "hpi
 
 ```
 
+## Extended Model
+```{r compute the irf and fevd results for data in extended model, eval=FALSE}
+ext.data.irf_fevd = irf_fevd(parameters, mydata, ext.struct)
+```
+
+```{r save the irf and fevd results for data in extended model, eval=FALSE}
+save(ext.data.irf_fevd, file = "ext.data.irf_fevd.RData")
+```
+
+```{r load the irf and fevd results for data in extended model, eval=TRUE}
+load("ext.data.irf_fevd.RData")
+```
+
+### Impulse response functions
+
+```{r irf of cashrate, extended model}
+#| label: ext.cashrate.irf
+#| fig-cap: "IRF plots for the AU Cash Rate Shock, Extended Model"
+#| fig-cap-location: top
+ext.cashrate.irf = plot_irf(5, ext.data.irf_fevd, parameters)
+```
+
+```{r irf of usffr, extended model}
+#| label: ext.usffr.irf
+#| fig-cap: "IRF plots for the US Federal Funds Rate Shock, Extended Model"
+#| fig-cap-location: top
+ext.usffr.irf = plot_irf(1, ext.data.irf_fevd, parameters)
+```
+
+### Forecast Error Variance Decomposition
+```{r fevd for nominal gdp, extended model}
+variable.choice = "Nominal GDP (log)"
+position = which(colnames(df) == variable.choice)
+ext.gdp.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+```{r fevd for consumption, extended model}
+variable.choice = "Aggregate Consumption (log)"
+position = which(colnames(df) == variable.choice)
+ext.con.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+```{r fevd for change in cpi, extended model}
+variable.choice = "% Change in CPI, yoy"
+position = which(colnames(df) == variable.choice)
+ext.cpi.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+```{r fevd for usffr, extended model}
+variable.choice = "US FFR Max Target Rate"
+position = which(colnames(df) == variable.choice)
+ext.usffr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+```{r fevd for quantity of new homes, extended model}
+variable.choice = "Quantity of new homes (log)"
+position = which(colnames(df) == variable.choice)
+ext.nh.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+```{r fevd for house price index, extended model}
+variable.choice = "House Price Index (log)"
+position = which(colnames(df) == variable.choice)
+ext.hpi.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+```{r fevd for homeloan rates, extended model, warning=FALSE}
+variable.choice = "Owner-occupied home loan rates"
+position = which(colnames(df) == variable.choice)
+ext.hlr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+```{r fevd for cashrate, extended model, warning=FALSE}
+variable.choice = "RBA Target Cash Rate"
+position = which(colnames(df) == variable.choice)
+ext.aucr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
 
 
+```{r fevd for m1, extended model}
+variable.choice = "M1 Money Supply (logs)"
+position = which(colnames(df) == variable.choice)
+ext.m1.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
+```
+
+
+```{r save fevd figures in a single plot for extended model, eval=FALSE}
+fevd.plots = c("ext.usffr.fevd", "ext.gdp.fevd", "ext.con.fevd", "ext.cpi.fevd", "ext.aucr.fevd", "ext.m1.fevd", "ext.hlr.fevd", "ext.nh.fevd", "ext.hpi.fevd")
+  # Save each plot as an EPS file
+  for (i in 1:length(fevd.plots)) {
+    filename <- paste0(fevd.plots[i], ".pdf")
+    pdf(file = filename, onefile = FALSE, height=9, width = 16)
+    plot_fevd(i, ext.data.irf_fevd, parameters)
+    dev.off()
+  }
+
+```
 # Appendix {#appendix}
 ```{r, file="L16 codes.R"}
 ```
