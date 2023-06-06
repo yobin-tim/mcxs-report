@@ -592,7 +592,7 @@ The choice of $D_i$ that minimises this distance is used to create the normalise
 #### Sample $B_{+n}$ independently
 For each draw of $b_n^{(s)}$, a corresponding draw of $B_{+n}^{(s)}$ is directly sampled from the normal distribution below:
 $$
-B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar Omega)
+B_{+n}^{(s)} \sim \mathcal{N}(b_n^{(s)}V_n \bar B_n, \bar \Omega)
 $$
 
 
@@ -638,21 +638,28 @@ posteriorMeans = function(Bposteriors){
 }
 ```
 
-The `pmatrix` function below prints the matrices in `R` in $\Latex$ form.
+The `pmatrix` function below prints the matrices in `R` in LaTeX form.
 ```{r  function to print matrix in latex format, echo=TRUE}
 pmatrix <- function(x) {
-  cat(c("$$\\begin{equation*}\n",
-    "\\left(",
-    knitr::kable(x, format = "latex", 
-                 tabular = "array",
-                 vline = "",
-                 align = "c",
-                 linesep = "",
-                 toprule = NULL,
-                 bottomrule = NULL),
-    "\n\\right)\\, .\n",
-    "\\end{equation*}$$\n"))
+  if (is.matrix(x)) {
+    cat(c("$$\\begin{equation*}\n",
+          "\\left(",
+          knitr::kable(x, format = "latex",
+                       tabular = "array",
+                       vline = "",
+                       align = "c",
+                       linesep = "",
+                       toprule = NULL,
+                       bottomrule = NULL),
+          "\\right)\\, .\n",
+          "\\end{equation*}$$\n"))
+  } else {
+    cat(c("$$\\begin{equation*}\n",
+          x,
+          "\\end{equation*}$$\n"))
+  }
 }
+
 ```
 
 ### Simulation Run
@@ -828,12 +835,12 @@ $$\bar \nu_{\kappa_0} = \underline \nu_{\kappa_0} +\sum_{n=1}^{N}r_n$$
 $$
   \begin{align*}
     & p(\kappa_+ | Y, X, B_+, B_0, \kappa_0) \propto p(B_+|\kappa_+, B_0, \kappa_0) p(\kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} )\\
-    & \propto \kappa_+^{-\frac{KN}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \underline B) (\kappa_+ I_{K})^{-1} (B_{+n} - b_n V_n \underline B)'  \right\} \cdot \kappa_+^{-\frac{\underline \nu_{\kappa_+} + 2}{2}} \exp \left\{  -\frac{ \kappa_+}{2 \underline s_{\kappa_+}} \right\}\\
-    & = \kappa_+^{-\frac{\underline \nu_{\kappa_+} + KN}{2} - 1} \cdot \exp \left\{  -\frac{1}{2} \left( (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' \cdot \frac{1}{\kappa_+} + \frac{1}{\underline s_{\kappa_+}} \kappa_+  \right) \right\}\\
+    & \propto \kappa_+^{-\frac{KN}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \underline B) (\kappa_+ I_{K})^{-1} (B_{+n} - b_n V_n \underline B)'  \right\} \cdot \kappa_+^{\frac{\underline \nu_{\kappa_+} - 2}{2}} \exp \left\{  -\frac{ \kappa_+}{2 \underline s_{\kappa_+}} \right\}\\
+    & = \kappa_+^{-\frac{-\underline \nu_{\kappa_+} + KN}{2} - 1} \cdot \exp \left\{  -\frac{1}{2} \left( (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' \cdot \frac{1}{\kappa_+} + \frac{1}{\underline s_{\kappa_+}} \kappa_+  \right) \right\}\\
   \end{align*}
 $$
   This gives
-$$\lambda = -\frac{\underline \nu_{\kappa_+} + KN}{2}$$
+$$\lambda = -\frac{-\underline \nu_{\kappa_+} + KN}{2}$$
 $$\chi =  \sum_{n=1}^N  (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)'$$
 $$\Psi = \frac{1}{\underline s_{\kappa_+}}$$
   
@@ -884,7 +891,7 @@ ext.sampling = function(parameters, struct, priors, usedata){
   
   # Now, update kappa
   kappa0.nu.post = priors$kappa0.nu + (usedata$N/2)
-  kappap.lambda.post = -(priors$kappap.nu + usedata$K * usedata$N)/2
+  kappap.lambda.post = -(-priors$kappap.nu + usedata$K * usedata$N)/2
   kappap.psi.post = 1/priors$kappap.s
   kappa0.s.post = priors$kappa0.s
   # kappap.chi.post = 0
@@ -920,7 +927,7 @@ structPosteriorMeans = function(struct){
 }
 ```
 
-### Simluation Run
+### Simulation Run
 
 ***Step 1:*** The following code computes the prior, initialises matrices to store results, and samples the draws for the simulated data.
 ```{r  Running extension for simulated data, echo=TRUE, eval = FALSE}
