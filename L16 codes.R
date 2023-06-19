@@ -105,6 +105,46 @@ rgn             = function(n,S.inv,nu,V,B0.initial){
 }
 
 
+rgn.row             = function(n,S.inv,nu,V,B0.initial,rownum){
+  # This function simulates draws for the unrestricted elements 
+  # of the conteporaneous relationships matrix of an SVAR model
+  # from a generalized-normal distribution according to algorithm 
+  # by Waggoner & Zha (2003, JEDC)
+  # n     - a positive integer, the number of draws to be sampled
+  # S     - an NxN positive definite matrix, a parameter of the generalized-normal distribution
+  # nu    - a positive scalar, degrees of freedom parameter
+  # V     - an N-element list, with fixed matrices
+  # B0.initial - an NxN matrix, of initial values of the parameters
+  
+  B0.aux        = B0.initial
+  n             = rownum
+  
+
+  rn            = nrow(V[[n]])
+  Un            = chol(nu*solve(V[[n]]%*%S.inv%*%t(V[[n]])))
+  w             = t(orthogonal.complement.matrix.TW(t(B0.aux[-n,])))
+  w1            = w %*% t(V[[n]]) %*% t(Un) / sqrt(as.numeric(w %*% t(V[[n]]) %*% t(Un) %*% Un %*% V[[n]] %*% t(w)))
+  if (rn>1){
+    Wn          = cbind(t(w1),orthogonal.complement.matrix.TW(t(w1)))
+  } else {
+    Wn          = w1
+  }
+  alpha         = rep(NA,rn)
+  u             = rmvnorm(1,rep(0,nu+1),(1/nu)*diag(nu+1))
+  alpha[1]      = sqrt(as.numeric(u%*%t(u)))
+  if (runif(1)<0.5){
+    alpha[1]    = -alpha[1]
+  }
+  if (rn>1){
+    alpha[2:rn] = rmvnorm(1,rep(0,nrow(V[[n]])-1),(1/nu)*diag(rn-1))
+  }
+  bn            = alpha %*% Wn %*% Un
+  B0.n    = bn %*% V[[n]]
+
+  
+  return(B0.n)
+}
+
 normalization.wz2003  = function(B0,B0.hat.inv, Sigma.inv, diag.signs){
   # This function normalizes a matrix of contemporaneous effects
   # according to the algorithm by Waggoner & Zha (2003, JOE)

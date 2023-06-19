@@ -8,9 +8,14 @@ execute:
 format: 
   html:
     toc-location: left
+    
+editor:
+  markdown: 
+    wrap: 72
   
 bibliography: references.bib
 ---
+
 
 > **Abstract.**  This project uses a Bayesian SVAR approach to estimate the effects of domestic and foreign monetary policy shocks on housing prices and number of new houses in Australia. The identification relies on imposing exclusion-restrictions and the estimation process follows the @waggoner2003a algorithm using the Gibbs sampler. In the extended version, we estimate the hyperparameters of the priors of the model. We find that a positive domestic monetary policy shock reduces both the number of new houses and housing prices, while a positive foreign (US) monetary policy shock reduces the number of new houses but increases housing prices.
 >
@@ -23,7 +28,7 @@ Monetary policy is one of the key instruments used by central banks to influence
 In this study, we aim to estimate the impact of monetary policy shocks on various housing indicators using a Structural Vector Autoregressive (SVAR) modelling approach. SVAR models are a popular econometric tool for investigating the dynamic interactions between macroeconomic variables. By applying this approach, we seek to shed light on how changes in monetary policy impact different dimensions of the housing market.
 
 # Research Question
-The objective of this paper is to estimate and quantify the impact of monetary policy shocks on different indicators of the housing market such as housing prices, housing transactions/sales, and the total number of housing units within an economy. Understanding these effects is crucial in understanding how money affects a key factor of the real side of the economy. An extension to this paper could be determining whether monetary policy shocks create a trade-off between controlling housing prices and controlling economic activity.
+The objective of this paper is to estimate and quantify the impact of monetary policy shocks on different indicators of the housing market such as housing prices, housing transactions/sales, and home loan rates within an economy. Understanding these effects is crucial in understanding how money affects a key factor of the real side of the economy. I formulate this question within a SVAR framework and make use of @waggoner2003a algorithm to sample for posterior draws of the coefficient matrices. I further extend the model using common parameterisation of hierarchical priors and estimate the model for better accuracy.
 
 # Data and their Properties
 ## Empirical Project Setup
@@ -48,15 +53,15 @@ I use the following variables to answer this question. I discuss the relevance o
 
 - $\log(GDP)$: represents the log of the Gross Domestic Product (GDP). Including this along with the consumption helps differentiate the effect on the non-consumption aspect of the economy.
 
-- $loanrate$: represents the weighted average interest rates on owner-occupied home loans. 
+- $loanrate$: represents the weighted average interest rates on owner-occupied home loans. This serves as a proxy for borrowing costs for households who save in the form of housing wealth.
 
 - $AUCR$: represents the Australian Cash Rate Target. This is the major monetary policy instrument available to the RBA.
 
 - $USFFR$: represents the Federal Funds Rate Maximum Target Rate. Monetary policy adopted in the US tend to ripple into other economies so this is a variable of interest. Another extension to this variable would be to include the Target rates of Australia's largest trading partners.
 
-- $nhouses$: represents the number of new private dwellings (houses) approved for construction in Australia. Impact on housing prices might be dampened by the supply elasticity of housing captured by this variable.
+- $nhouses$: represents the number of new private dwellings (houses) approved for construction in Australia. Impact on housing prices might be dampened by the supply elasticity of housing captured by this variable. Moreover, macroeconomic conditions may determine the level of new construction projects undertaken domestically.
 
-- $PPI$: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012.
+- $PPI$: represents the Property Price Index in Australia. The index is normalized with respect to the property prices in 2011-2012 (=100). Tracking the effect of monetary policy on housing prices is a key object of interest.
 
 
 ```{r download relevant variables, eval=FALSE, warning=FALSE}
@@ -134,6 +139,8 @@ df                                      <- df %>% select("US FFR Max Target Rate
   load(file = "ProjectData.RData") # load saved empirical data if needed
 ```
 
+Below is a preview of the dataset used in this project.
+
 ```{r show the first few observations from the dataset, eval=TRUE, warning=FALSE}
 head_df <- head(df)
 rmarkdown::paged_table(head_df)
@@ -145,13 +152,9 @@ save.image(file="ProjectData.RData")
 
 
 ## Data Properties
-The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behaviour.
+The dataset consists quarterly data from 2003 Q3 to 2021 Q4. The variables discussed above are illustrated in the figure below. Note that the logged variables trend upwards because they are expressed in their levels, while variables expressed in percentage change terms do not exhibit this behaviour.
 
-
-The dataset will be used in the sample consists quarterly data from 2003 Q3 to 2021 Q4, including 74 observations, plots of truncated dataset is shown as: 
-
-
-```{r plot the data, echo=TRUE}
+```{r plot the data, echo=FALSE}
 var_names <- colnames(df)
 date_range <- as.yearqtr(rownames(df), format = "%Y Q%q")
 par(mfrow = c(3,3), mar=c(2,2,2,2))
@@ -179,11 +182,12 @@ dev.off()
 ```
 
 
-
 ### ADF Tests
 Next, I perform and display ADF test results on the variables. I report, for each variable, the difference level at which the ADF tests rejects the null that the series is non-stationary. 
 
 ```{r  perform adf tests on the data, warning= FALSE, echo=TRUE}
+#| code-fold: true
+#| code-summary: "ADF Test"
 
 perform_adf_tests <- function(df) {
   # Create an empty dataframe to store the results
@@ -243,6 +247,7 @@ rmarkdown::paged_table(adf_test_results)
 adf_table = xtable::xtable(adf_test_results)
 print(adf_table, file = "adf_table.tex", include.rownames = FALSE)
 ```
+
 
 
 ### ACF Plots
@@ -371,9 +376,10 @@ $$ p(B_0, B_+) = \left( \prod_{n=1}^N p(B_{+n}|b_n)\right) p(b_1, \dots, b_N) $$
 
 This classification of the joint-distribution allows us to obtain natural-conjugate prior and corresponding posterior distributions.
 
-Moreover, the following function imposes a lower-triangular restriction on $B_0$ and creates a list containing a matrix of $b_n$ and corresponding $V_n$ row vectors. 
+Moreover, the following `ltexclusion` function imposes a lower-triangular restriction on $B_0$ and creates a list containing a matrix of $b_n$ and corresponding $V_n$ row vectors. 
 ```{r  Impose the type of exclusion restriction, echo=TRUE}
-
+#| code-fold: true
+#| code-summary: "Imposing lower-triangular exclusion restrictions"
 ltexclusion = function(usedata){
   BM.V        = vector("list",usedata$N)
 for (n in 1:usedata$N){
@@ -416,9 +422,9 @@ We also calibrate the number of draws $S = 5000$ for any sampling, while the $S.
 
 The following `R` code creates a list of model parameters with the calibration as above. 
 ```{r  set prior parameters, echo=TRUE}
-
-# set the priors
-
+#| code-fold: true
+#| code-summary: "List of Parameters"
+# set the priors' parameters
 parameters = list(
   kappa1    = .1,       # autoregressive slope shrinkage
   kappa2    = 10,       # constant term shrinkage
@@ -432,7 +438,10 @@ parameters = list(
 
 The following `R` function takes as argument data and model parameters to compute parameters of the prior distribution and store it as a list.
 ```{r  define the prior function, echo=TRUE}
-# A function that computes and stores all the prior distribution components given a parameter list input
+#| code-fold: true
+#| code-summary: "Prior Function"
+# A function that computes and stores 
+# all the prior distribution components given a parameter list input
 prior     = function(parameters, usedata){
   priors  = list(
   B       = cbind(rep(0,usedata$N), parameters$kappa4*diag(usedata$N), matrix(0, usedata$N, (usedata$p-1)*usedata$N)), # random walk prior
@@ -507,18 +516,20 @@ where the first three parameters are defined above and $\bar \nu = T + \underlin
 
 The following `R` function uses the prior and information contained in data to compute and store (as a list) the set of posterior parameters for our model. 
 ```{r  define the posterior function, echo=TRUE}
+#| code-fold: true
+#| code-summary: "Posterior Function"
 posterior     = function(priors, usedata){
   Omega.inv   = solve(priors$Omega)
   Omega.post.inv = usedata$X%*%t(usedata$X) + Omega.inv
   Omega.post  = solve( Omega.post.inv )
   B.post      = (usedata$Y%*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
-  S.post      = solve(usedata$Y%*%t(usedata$Y) + solve(priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post) )
+  S.inv.post      = usedata$Y%*%t(usedata$Y) + solve(priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post)
   nu.post     = ncol(usedata$Y) + priors$nu
 
   posteriors  = list(
   B           = B.post,
   Omega       = Omega.post,
-  S           = S.post,
+  S.inv       = S.inv.post,
   nu          = nu.post
 )
 }
@@ -598,15 +609,17 @@ $$
 
 The `posteriorSimuations` function below takes model parameters, the posterior parameters, the exclusion restriction and the number of variables as given to sample draws using the Gibbs sampler. The functions `rgn`, `normalize.Gibbs.output.parallel` and `rnorm.ngn` are obtained from [Tomasz Woźniak](https://github.com/donotdespair)'s lecture notes. These functions are provided in the [Appendix](#appendix).
 ```{r  function to sample B0 and then B+ using wz2003, echo=TRUE}
+#| code-fold: true
+#| code-summary: "Function to sample B0 and Bplus posteriors"
 posteriorSimulations  = function(parameters, posteriors, B0Vlist, N){
   t0                  = proc.time()
-  B0.posterior        = rgn(n=parameters$S.burnin, S.inv=solve(posteriors$S), nu=posteriors$nu, V=B0Vlist$V, B0.initial=B0Vlist$B0.initial)
+  B0.posterior        = rgn(n=parameters$S.burnin, S.inv=posteriors$S.inv, nu=posteriors$nu, V=B0Vlist$V, B0.initial=B0Vlist$B0.initial)
   t1                  = proc.time()
   (t1-t0)/60
   
   # sampling B0 from the posterior distribution using Gibbs
   t0                  = proc.time()
-  B0.posterior        = rgn(n=parameters$S, S.inv=solve(posteriors$S), nu=posteriors$nu, V=B0Vlist$V, B0.initial=B0.posterior[,,parameters$S.burnin])
+  B0.posterior        = rgn(n=parameters$S, S.inv=posteriors$S.inv, nu=posteriors$nu, V=B0Vlist$V, B0.initial=B0.posterior[,,parameters$S.burnin])
   t1                  = proc.time()
   (t1-t0)/60
   
@@ -630,6 +643,8 @@ posteriorSimulations  = function(parameters, posteriors, B0Vlist, N){
 
 The `posteriorMeans` function below computes the sample average of the $B_0$ and $B_+$ matrices obtained from each sampling step.
 ```{r  function to compute means for posterior B0 and B+, echo=TRUE}
+#| code-fold: true
+#| code-summary: "posteriorMeans Function"
 posteriorMeans = function(Bposteriors){
   Bposteriors.means = list(
   B0 = rowMeans(Bposteriors$B0.posterior, dims = 2),
@@ -640,6 +655,8 @@ posteriorMeans = function(Bposteriors){
 
 The `pmatrix` function below prints the matrices in `R` in LaTeX form.
 ```{r  function to print matrix in latex format, echo=TRUE}
+#| code-fold: true
+#| code-summary: "Function to print matrix in LaTeX format"
 pmatrix <- function(x) {
   if (is.matrix(x)) {
     cat(c("$$\\begin{equation*}\n",
@@ -781,12 +798,15 @@ data_B0 = pmatrix(Bposterior.means$B0)
 data_Bp = pmatrix(Bposterior.means$Bp)
 ```
 
-## Extended Model
+
+
+# Extended Model
 In the extended model, I will estimate the hyperparameters rather than setting them exogenously. Such estimation procedure often improves the fit of the model especially because the results can be sensitive to the parameterisation of the hyperparameters. 
-In particular, I estimate $(\kappa_0, \kappa_+)$ such that $\underline S = \kappa_0 I_N$ and $\underline \Omega = \kappa_+ I_K$.
+In particular, I estimate $(\kappa_0, \kappa_+)$ such that $\underline S = \kappa_0 I_N$ and $\underline \Omega = \kappa_+ I_K$. I assume 
+
+## Extension 1: Normal-Gamma Prior Hyperparameter Estimation
 
 ### Prior Distribution
-
 I postulate the following prior distributions for the hyperparameters:
 $$
 \begin{align*}
@@ -796,6 +816,8 @@ $$
 
 The `ext.priors` function creates a list containing all the elements of the prior.
 ```{r  hyperparameter priors, echo=TRUE}
+#| code-fold: true
+#| code-summary: "Extension Model Priors Function"
 ext.priors = function(parameters,usedata){
   ext.prior = list(
   kappa0.s = .1,
@@ -834,15 +856,15 @@ $$\bar \nu_{\kappa_0} = \underline \nu_{\kappa_0} +\sum_{n=1}^{N}r_n$$
   Also,
 $$
   \begin{align*}
-    & p(\kappa_+ | Y, X, B_+, B_0, \kappa_0) \propto p(B_+|\kappa_+, B_0, \kappa_0) p(\kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} )\\
+    & p(\kappa_+ | Y, X, B_+, B_0) \propto p(B_+|\kappa_+, B_0) p(\kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} )\\
     & \propto \kappa_+^{-\frac{KN}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \underline B) (\kappa_+ I_{K})^{-1} (B_{+n} - b_n V_n \underline B)'  \right\} \cdot \kappa_+^{\frac{\underline \nu_{\kappa_+} - 2}{2}} \exp \left\{  -\frac{ \kappa_+}{2 \underline s_{\kappa_+}} \right\}\\
     & = \kappa_+^{-\frac{-\underline \nu_{\kappa_+} + KN}{2} - 1} \cdot \exp \left\{  -\frac{1}{2} \left( (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' \cdot \frac{1}{\kappa_+} + \frac{1}{\underline s_{\kappa_+}} \kappa_+  \right) \right\}\\
   \end{align*}
 $$
   This gives
-$$\lambda = -\frac{-\underline \nu_{\kappa_+} + KN}{2}$$
-$$\chi =  \sum_{n=1}^N  (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)'$$
-$$\Psi = \frac{1}{\underline s_{\kappa_+}}$$
+$$\bar\lambda = -\frac{-\underline \nu_{\kappa_+} + KN}{2}$$
+$$\bar \chi =  \sum_{n=1}^N  (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)'$$
+$$\bar \Psi = \frac{1}{\underline s_{\kappa_+}}$$
   
   
 The `init.struct` function creates and initialise a list that contains matrices to store draws of $\{\kappa_0^{(s)}, \kappa_+^{(s)}, B_0^{(s)}, B_+^{(s)}\}_{s =1}^{S}$.
@@ -859,8 +881,19 @@ The `init.struct` function creates and initialise a list that contains matrices 
 ```
 
 ### (Gibbs) Sampling
+Given the full conditional posteriors of both $(\kappa_0,\kappa_+)$ and $(B_0, B_+)$, we can implement the Gibbs sampler as follows:
 
-The sampling function `ext.sampling` is given below. The sampling procedure is as 
+- Step 1: Initialise $(\kappa_0^{(0)},\kappa_+^{(0)})$. 
+
+- Step 2: Use $(\kappa_0^{(s-1)},\kappa_+^{(s-1)})$ values to compute posterior parameters for each draw $(\bar B, \bar \Omega, \bar s, \bar \nu)^{(s)}$.
+
+- Step 3: draw $(B_0, B_+)^{(s)} \sim \mathcal{NGN}(\bar B, \bar \Omega, \bar s, \bar \nu)^{(s)}$ using the sampling procedure presented in the baseline model.
+
+- Step 4: draw $\kappa_0^{(s)} \sim p(\kappa_0 | Y, X, B_0^{(s)}) = \mathcal{IG2}(\bar s_{\kappa_0}, \bar \nu_{\kappa_0})$ and $\kappa_+^{(s)} \sim p(\kappa_+ | Y, X, B_0^{(s)}, B_+^{(s)}) = \mathcal{GIG}(\bar \lambda, \bar \chi, \bar \Psi)$.
+
+Repeat steps 2-4 to get desired sample size and burn in some initial sample observations as needed.
+
+The sampling function `ext.sampling` is given below. 
 ```{r  Sampling, echo=TRUE}
 ext.sampling = function(parameters, struct, priors, usedata){
   set.seed(12345)
@@ -873,7 +906,7 @@ ext.sampling = function(parameters, struct, priors, usedata){
     Omega.post.inv = usedata$X%*%t(usedata$X) + Omega.inv
     Omega.post     = solve(Omega.post.inv)
     B.post         = (usedata$Y%*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
-    S.post         = solve(usedata$Y%*%t(usedata$Y) + solve(struct$kappa0[i] * priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post) )
+    S.post         = usedata$Y%*%t(usedata$Y) + solve(struct$kappa0[i] * priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post) 
     nu.post        = ncol(usedata$Y) + priors$nu
 
 
@@ -881,12 +914,12 @@ ext.sampling = function(parameters, struct, priors, usedata){
     B0.initial = struct$B0.post[,,i-1]
   }
   
-  B0.i = rgn(n=1, S.inv = solve(S.post), nu = nu.post, V = B0Vlist.initial$V, B0.initial = B0.initial)
-  B0.hat = t(chol((nu.post - usedata$N)*S.post))
-  B0.norm.i = normalize.Gibbs.output.parallel(B0.i, B0.hat)
-  Bp.i = rnorm.ngn(B0.norm.i, B.post, Omega.post)
+  B0.i = rgn(n=1, S.inv = S.post, nu = nu.post, V = B0Vlist.initial$V, B0.initial = B0.initial)
+  # B0.hat = t(chol((nu.post - usedata$N)*solve(S.post)))
+  # B0.norm.i = normalize.Gibbs.output.parallel(B0.i, B0.hat)
+  Bp.i = rnorm.ngn(B0.i, B.post, Omega.post)
   
-  struct$B0.posterior[,,i] = B0.norm.i
+  struct$B0.posterior[,,i] = B0.i
   struct$Bp.posterior[,,i] = Bp.i
   
   # Now, update kappa
@@ -894,11 +927,9 @@ ext.sampling = function(parameters, struct, priors, usedata){
   kappap.lambda.post = -(-priors$kappap.nu + usedata$K * usedata$N)/2
   kappap.psi.post = 1/priors$kappap.s
   kappa0.s.post = priors$kappa0.s
-  # kappap.chi.post = 0
   for (n in 1:usedata$N){
-    # kappa0.s.post = kappa0.s.post + B0.norm.i[n,,1] %*% t( B0.norm.i[n,,1])
-    kappa0.s.post = kappa0.s.post + sum(B0.norm.i[n,,1]^2)
-    kappap.chi.post = (Bp.i[n,,1] - B0.norm.i[n,,1] %*% B.post) %*% t(Bp.i[n,,1] - B0.norm.i[n,,1] %*% B.post)
+    kappa0.s.post = kappa0.s.post + sum(B0.i[n,,1]^2)
+    kappap.chi.post = (Bp.i[n,,1] - B0.i[n,,1] %*% B.post) %*% t(Bp.i[n,,1] - B0.i[n,,1] %*% B.post)
   }
   
   if (i != (parameters$S + parameters$S.burnin)){
@@ -910,6 +941,22 @@ ext.sampling = function(parameters, struct, priors, usedata){
   struct$kappap = struct$kappap[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
   struct$B0.posterior = struct$B0.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
   struct$Bp.posterior = struct$Bp.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  
+  # Set normalising matrix
+  B0.last_draw = struct$B0.posterior[,,parameters$S]
+  B0_hat = diag(sign(diag(B0.last_draw))) %*% B0.last_draw
+  
+  # Compute normalised B0
+  B0.norm = normalize.Gibbs.output.parallel(struct$B0.posterior, B0_hat)
+  
+  # Compute and save normalised BP
+  for (i in 1:parameters$S){
+    struct$Bp.posterior[,,i] = B0.norm[,,i] %*% solve(struct$B0.posterior[,,i]) %*% struct$Bp.posterior[,,i]
+  }
+  
+  # Save normalised B0
+  struct$B0.posterior = B0.norm
+  
   return(struct)
   
 }
@@ -973,6 +1020,24 @@ ext.sim.data_kappap = pmatrix(ext.sim.struct.means$kappap)
 
 ```
 
+```{r ext histogram of kappa draws simulated data}
+par(mfrow=c(1,2))
+hist(ext.sim.struct$kappa0,
+     breaks = 100,
+     col = "deepskyblue2",
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa[0], " draws")),
+     xlab = ""
+     )
+hist(ext.sim.struct$kappap,
+     breaks = 100,
+     col = 'deepskyblue2',
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa["+"], " draws")),
+     xlab = ""
+     )
+```
+
 ### Data Results
 
 ***Step 1:*** The following code computes the prior, initialises matrices to store results, and samples the draws for the actual data.
@@ -1015,6 +1080,556 @@ ext.data_kappa0 = pmatrix(ext.struct.means$kappa0)
 ```{r display the extension model posterior mean of kappa_+, results='asis', echo=TRUE}
 ext.data_kappap = pmatrix(ext.struct.means$kappap)
 ```
+
+```{r ext histogram of kappa draws}
+par(mfrow=c(1,2))
+hist(ext.struct$kappa0,
+     breaks = 100,
+     col = "deepskyblue2",
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa[0], " draws")),
+     xlab = ""
+     )
+hist(ext.struct$kappap,
+     breaks = 100,
+     col = 'deepskyblue2',
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa["+"], " draws")),
+     xlab = ""
+     )
+```
+
+## Extension 2: Inverse Normal Gamma Prior Hyperparameter Estimation
+### Prior Distribution
+Alternatively, I estimate $(\kappa_0, \kappa_+)$ assuming that these shrinkage parameters follow an inverse gamma 2 $(\mathcal{IG}2)$ distribution.
+$$
+\begin{align*}
+    \kappa_0 | \underline s_{\kappa_0}, \underline \nu_{\kappa_0} \sim \mathcal{IG}2(\underline s_{\kappa_0}, \underline \nu_{\kappa_0})  && \kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} \sim \mathcal{IG2}(\underline s_{\kappa_+},\underline \nu_{\kappa_+}) 
+  \end{align*}
+$$
+The `ext.priors` function can be used to initialise these priors as well.
+
+### Posterior Distribution
+Thus, posteriors can be written as
+$$
+  \begin{align*}
+    & p(\kappa_0 | Y, X, B_0) \propto p(B_0|\kappa_0) p(\kappa_0 | \underline s_{\kappa_0}, \underline \nu_{\kappa_0} )\\
+    & \propto \prod_{n=1}^{N}\left(\kappa_0^{-\frac{1}{2}}\right)^{r_n} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N b_n V_n (\kappa_0 I_N)^{-1} V_n' b_n'  \right\} \cdot \kappa_0^{-\frac{\underline \nu_{\kappa_0}+2}{2}} \exp \left\{  -\frac{\underline s_{\kappa_0}}{2 \kappa_0} \right\}\\ 
+    & \propto \kappa_0^{ -\frac{\underline \nu_{\kappa_0} + 2 + \sum_{n=1}^{N}r_n}{2}} \cdot \exp \left\{  -\frac{1}{2 \kappa_0} \sum_{n=1}^N b_n V_n V_n' b_n' + \underline s_{\kappa_0} \right\}\\
+  \end{align*}
+$$
+  This gives
+$$\bar s_{\kappa_0} =  \sum_{n=1}^N b_n V_n V_n' b_n' + \underline s_{\kappa_0}.$$
+$$\bar \nu_{\kappa_0} = \underline \nu_{\kappa_0} +\sum_{n=1}^{N}r_n$$
+  Also,
+$$
+  \begin{align*}
+    & p(\kappa_+ | Y, X, B_+, B_0, \kappa_0) \propto p(B_+|\kappa_+, B_0, \kappa_0) p(\kappa_+ | \underline s_{\kappa_+}, \underline \nu_{\kappa_+} )\\
+    & \propto \kappa_+^{-\frac{KN}{2}} \exp \left\{  -\frac{1}{2} \sum_{n=1}^N (B_{+n} - b_n V_n \underline B) (\kappa_+ I_{K})^{-1} (B_{+n} - b_n V_n \underline B)'  \right\} \cdot \kappa_+^{-\frac{\underline \nu_{\kappa_+} + 2}{2}} \exp \left\{-\frac{\underline s_{\kappa_+}}{2\kappa_+} \right\}\\
+    & = \kappa_+^{-\frac{\underline \nu_{\kappa_+} + KN +2}{2}} \cdot \exp \left\{  -\frac{1}{2\kappa_+} \left(\sum_{n=1}^N (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)' + \underline s_{\kappa_+}   \right) \right\}\\
+  \end{align*}
+$$
+  This gives
+$$\bar s_{\kappa_+} = \sum_{n=1}^N (B_{+n} - b_n V_n \underline B)  (B_{+n} - b_n V_n \underline B)'  + \underline s_{\kappa_+}.$$
+$$\bar \nu_{\kappa_+} = \underline \nu_{\kappa_+} +KN$$
+
+### (Gibbs) Sampling
+Given the full conditional posteriors of both $(\kappa_0,\kappa_+)$ and $(B_0, B_+)$, we can implement the Gibbs sampler as follows:
+
+- Step 1: Initialise $(\kappa_0^{(0)},\kappa_+^{(0)})$. 
+
+- Step 2: Use $(\kappa_0^{(s-1)},\kappa_+^{(s-1)})$ values to compute posterior parameters for each draw $(\bar B, \bar \Omega, \bar s, \bar \nu)^{(s)}$.
+
+- Step 3: draw $(B_0, B_+)^{(s)} \sim \mathcal{NGN}(\bar B, \bar \Omega, \bar s, \bar \nu)^{(s)}$ using the sampling procedure presented in the baseline model.
+
+- Step 4: draw $\kappa_0^{(s)} \sim p(\kappa_0 | Y, X, B_0^{(s)}) = \mathcal{IG2}(\bar s_{\kappa_0}, \bar \nu_{\kappa_0})$ and $\kappa_+^{(s)} \sim p(\kappa_+ | Y, X, B_0^{(s)}, B_+^{(s)}) = \mathcal{IG2}(\bar s_{\kappa_+}, \bar \nu_{\kappa_+})$.
+
+Repeat steps 2-4 to get desired sample size and burn in some initial sample observations as needed.
+
+The sampling function `ext2.sampling` is given below. 
+```{r  Extension 2 Sampling, echo=TRUE}
+ext2.sampling = function(parameters, struct, priors, usedata){
+  set.seed(12345)
+  B0Vlist.initial = ltexclusion(usedata)
+  B0.initial = B0Vlist.initial$B0
+  for (i in 1:(parameters$S + parameters$S.burnin)){
+    
+    # Computing posterior parameters for each draw
+    Omega.inv      = solve(struct$kappap[i] * priors$Omega)
+    Omega.post.inv = usedata$X%*%t(usedata$X) + Omega.inv
+    Omega.post     = solve(Omega.post.inv)
+    B.post         = (usedata$Y%*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
+    S.post         = usedata$Y%*%t(usedata$Y) + solve(struct$kappa0[i] * priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post)
+    nu.post        = ncol(usedata$Y) + priors$nu
+
+
+  if (i > 1){
+    B0.initial = struct$B0.post[,,i-1]
+  }
+  
+  B0.i = rgn(n=1, S.inv = S.post, nu = nu.post, V = B0Vlist.initial$V, B0.initial = B0.initial)
+  # B0.hat = t(chol((nu.post - usedata$N)*S.post))
+  # B0.norm.i = normalize.Gibbs.output.parallel(B0.i, B0.hat)
+  Bp.i = rnorm.ngn(B0.i, B.post, Omega.post)
+  
+  struct$B0.posterior[,,i] = B0.i
+  struct$Bp.posterior[,,i] = Bp.i
+  
+  # Now, update kappa
+  kappa0.nu.post = priors$kappa0.nu + (usedata$N/2)
+  kappap.nu.post = priors$kappap.nu + usedata$K * usedata$N
+  kappa0.s.post  = priors$kappa0.s
+  kappap.s.post  = priors$kappap.s
+  # kappap.chi.post = 0
+  for (n in 1:usedata$N){
+    kappa0.s.post = kappa0.s.post + sum(B0.i[n,,1]^2)
+    kappap.s.post = kappap.s.post + (Bp.i[n,,1] - B0.i[n,,1] %*% priors$B)%*%t(Bp.i[n,,1] - B0.i[n,,1] %*% priors$B)
+  }
+  
+  if (i != (parameters$S + parameters$S.burnin)){
+    struct$kappa0[i+1] = kappa0.s.post / rchisq(n=1,df = kappa0.nu.post)
+    struct$kappap[i+1] = kappap.s.post / rchisq(n=1,df = kappap.nu.post)
+  }
+  }
+  struct$kappa0 = struct$kappa0[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$kappap = struct$kappap[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$B0.posterior = struct$B0.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$Bp.posterior = struct$Bp.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  
+  # Set normalising matrix
+  B0.last_draw = struct$B0.posterior[,,parameters$S]
+  B0_hat = diag(sign(diag(B0.last_draw))) %*% B0.last_draw
+  
+  # Compute normalised B0
+  B0.norm = normalize.Gibbs.output.parallel(struct$B0.posterior, B0_hat)
+  
+  # Compute normalised BP
+  for (i in 1:parameters$S){
+    struct$Bp.posterior[,,i] = B0.norm[,,i] %*% solve(struct$B0.posterior[,,i]) %*% struct$Bp.posterior[,,i]
+  }
+  
+  # Save normalised B0
+  struct$B0.posterior = B0.norm
+  
+  return(struct)
+  
+}
+
+```
+
+### Simulation Run
+***Step 1:*** The following code computes the prior, initialises matrices to store results, and samples the draws for the simulated data.
+```{r  Running extension 2 for simulated data, echo=TRUE, eval = FALSE}
+ext2.sim.prior = ext.priors(parameters, artificialdata)
+ext2.sim.struct = init.struct(artificialdata, parameters$S + parameters$S.burnin)
+ext2.sim.struct <- ext2.sampling(parameters, ext2.sim.struct, ext2.sim.prior, artificialdata)
+```
+
+```{r  save simulation 2 struct, eval=FALSE}
+save(ext2.sim.struct, file = "ext2.sim.struct.RData")
+```
+
+```{r  load simulation 2 struct, eval=TRUE}
+load(file = "ext2.sim.struct.RData")
+```
+
+***Step 2:*** The following code computes and stores the posterior means of $\{\kappa_0^{(s)}, \kappa_+^{(s)}, B_0^{(s)}, B_+^{(s)}\}_{s =1}^{S}$.
+```{r  compute the simulated 2 struct posterior means for the data, echo=TRUE}
+ext2.sim.struct.means = structPosteriorMeans(ext2.sim.struct)
+```
+
+***Step 3:*** The code snippets below display the sample posterior means of the estimated objects using simulated data.
+
+The following code computes the posterior mean of $B_0$.
+```{r  display in latex mode the simulated 2 posterior means of B_0, results='asis', echo=TRUE}
+ext2.sim.data_B0 = pmatrix(ext2.sim.struct.means$B0)
+```
+
+The following code computes the posterior mean of $B_+$.
+```{r ext2 display sample average B_+, results='asis', echo=TRUE}
+ext2.sim.data_Bp = pmatrix(ext2.sim.struct.means$Bp)
+
+```
+
+The following code computes the posterior mean of $\kappa_0$.
+```{r ext2 display sample average draw of kappa_0, results='asis', echo=TRUE}
+ext2.sim.data_kappa0 = pmatrix(ext2.sim.struct.means$kappa0)
+```
+
+The following code computes the posterior mean of $\kappa_+$.
+```{r ext2 display sample average draw of kappa_+, results='asis', echo=TRUE}
+ext2.sim.data_kappap = pmatrix(ext2.sim.struct.means$kappap)
+
+```
+
+```{r ext2 histogram of kappa draws simulated data}
+par(mfrow=c(1,2))
+hist(ext2.sim.struct$kappa0,
+     breaks = 100,
+     col = "deepskyblue2",
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa[0], " draws")),
+     xlab = ""
+     )
+hist(ext2.sim.struct$kappap,
+     breaks = 100,
+     col = 'deepskyblue2',
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa["+"], " draws")),
+     xlab = ""
+     )
+```
+
+### Data Results
+
+***Step 1:*** The following code computes the prior, initialises matrices to store results, and samples the draws for the actual data.
+```{r  ext2 Running extension for actual data, eval = FALSE, include=TRUE}
+ext2.prior = ext.priors(parameters, mydata)
+ext2.struct = init.struct(mydata, parameters$S + parameters$S.burnin)
+ext2.struct <- ext2.sampling(parameters, ext2.struct, ext2.prior, mydata)
+```
+
+```{r  ext2 save struct for extension model, eval=FALSE}
+save(ext2.struct, file = "ext2.struct.RData")
+```
+
+```{r  ext2 load struct for extension model, eval=TRUE}
+load(file = "ext2.struct.RData")
+```
+
+
+
+***Step 2:*** The following code computes and stores the posterior means of $\{\kappa_0^{(s)}, \kappa_+^{(s)}, B_0^{(s)}, B_+^{(s)}\}_{s =1}^{S}$.
+```{r  ext2 compute the struct posterior means for the data, echo=TRUE}
+ext2.struct.means = structPosteriorMeans(ext2.struct)
+```
+
+***Step 3:*** The code snippets below display the sample posterior means of the estimated objects using actual data.
+
+```{r  ext2 display in latex mode the posterior means matrices, results='asis', echo=TRUE}
+ext2.data_B0 = pmatrix(ext2.struct.means$B0)
+
+```
+
+```{r ext2 display the extension model posterior mean of B_0, results='asis', echo=TRUE}
+ext2.data_Bp = pmatrix(ext2.struct.means$Bp)
+```
+
+```{r ext2 display the extension model posterior mean of kappa_0, results='asis', echo=TRUE}
+ext2.data_kappa0 = pmatrix(ext2.struct.means$kappa0)
+```
+
+```{r ext2 display the extension model posterior mean of kappa_+, results='asis', echo=TRUE}
+ext2.data_kappap = pmatrix(ext2.struct.means$kappap)
+```
+
+```{r ext2 histogram of kappa draws}
+par(mfrow=c(1,2))
+hist(ext2.struct$kappa0,
+     breaks = 100,
+     col = "deepskyblue2",
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa[0], " draws")),
+     xlab = ""
+     )
+hist(ext2.struct$kappap,
+     breaks = 100,
+     col = 'deepskyblue2',
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa["+"], " draws")),
+     xlab = ""
+     )
+```
+
+## Extension 3: Stochastic Volatility
+Next, I introduce stochastic volatility in the form of common conditional heteroskedasticity of the structural errors. We assume that
+$$
+u_t|X \sim N_N(0_N, diag(\sigma^2_t I_n))
+$$
+where $\sigma^2_{T \times 1} = (\exp(h_1), \dots, \exp(h_T))$. This introduction of stochastic volatility transforms the posterior parameters of $(B_+,B_0)$ as follows:
+$$
+\begin{align*}
+&\bar \Omega = (X diag(\sigma^2) X' + \underline \Omega^{-1})^{-1}\\
+&\bar B = (Ydiag(\sigma^2)X' + \underline B \underline \Omega^{-1}) \bar \Omega\\
+&\bar S = (Ydiag(\sigma^2)Y' + \underline S^{-1} + \underline B \underline \Omega^{-1} \underline B' - \bar B \bar \Omega^{-1} \bar B')^{-1}
+\end{align*}
+$$
+while $\bar \nu = T + \underline \nu$ updates the same way as before.
+
+### (Gibbs) Sampling
+
+```{r SV priors}
+SVpriors= function(T){
+  H = diag(T) - rbind(rep(0,1,T),diag(1,T-1,T))
+  priors = list(
+  h0.v = 1, 
+  h0.m = 0,
+  sigmav.s = 0.01,
+  sigmav.nu = 10,
+  HH = t(H)%*%H
+)
+}
+```
+
+```{r sv aux}
+SVaux = function(Y,X, B0, Bp, T){
+  aux = list(
+    Y = Y,
+    X = X,
+    H = array(0,c(T,1)),
+    h0 = 0,
+    sigma.v2 = 1,
+    s = array(1,c(T,1)),
+    Bplus = Bp,
+    B0 = B0,
+    sigma2 = array(1,c(T,1))
+  )
+}
+```
+
+
+The Gibbs sampler for the stochastic volatility component is implemented in the `SVcommonSF.Gibbs.iteration` function below.
+```{r ext3 SV gibbs sampler, echo=TRUE}
+#| code-fold: true
+#| code-summary: "Common SV component sampler"
+############################################################
+# prepared by Tomasz Woźniak
+############################################################
+
+SVcommonSF.Gibbs.iteration = function(aux, priors){
+  # A single iteration of the Gibbs sampler for the SV component
+  #
+  # aux is a list containing:
+  #   Y - a NxT matrix
+  #   X - a KxT matrix
+  #   H - a Tx1 matrix
+  #   h0 - a scalar
+  #   sigma.v2 - a scalar
+  #   s - a Tx1 matrix
+  #   Bplus - a NxK matrix
+  #   B0 - an NxN matrix
+  #   sigma2 - a T-vector
+  #
+  # priors is a list containing:
+  #   h0.v - a positive scalar
+  #   h0.m - a scalar
+  #   sigmav.s - a positive scalar
+  #   sigmav.nu - a positive scalar
+  #   HH - a TxT matrix
+  
+  T             = dim(aux$Y)[2]
+  N             = dim(aux$Y)[1]
+  alpha.st      = c(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000)
+  sigma.st      = c(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342)
+  pi.st         = c(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115)
+  
+  Z             = rowSums( t( aux$B0 %*% aux$Y - aux$Bplus %*% aux$X ) ) / sqrt(N)
+  Y.tilde       = as.vector(log((Z + 0.0000001)^2))
+  Ytilde.alpha  = as.matrix(Y.tilde - alpha.st[as.vector(aux$s)])
+  
+  # sampling initial condition
+  ############################################################
+  V.h0.bar      = 1/((1 / priors$h0.v) + (1 / aux$sigma.v2))
+  m.h0.bar      = V.h0.bar*((priors$h0.m / priors$h0.v) + (aux$H[1] / aux$sigma.v2))
+  h0.draw       = rnorm(1, mean = m.h0.bar, sd = sqrt(V.h0.bar))
+  aux$h0        = h0.draw
+  
+  # sampling sigma.v2
+  ############################################################
+  sigma.v2.s    = priors$sigmav.s + sum(c(aux$H[1] - aux$h0, diff(aux$H))^2)
+  sigma.v2.draw = sigma.v2.s / rchisq(1, priors$sigmav.nu + T)
+  aux$sigma.v2  = sigma.v2.draw
+  
+  # sampling auxiliary states
+  ############################################################
+  Pr.tmp        = simplify2array(lapply(1:10,function(x){
+    dnorm(Y.tilde, mean = as.vector(aux$H + alpha.st[x]), sd = sqrt(sigma.st[x]), log = TRUE) + log(pi.st[x])
+  }))
+  Pr            = t(apply(Pr.tmp, 1, function(x){exp(x - max(x)) / sum(exp(x - max(x)))}))
+  s.cum         = t(apply(Pr, 1, cumsum))
+  r             = matrix(rep(runif(T), 10), ncol = 10)
+  ss            = apply(s.cum < r, 1, sum) + 1
+  aux$s         = as.matrix(ss)
+  
+  
+  # sampling log-volatilities using functions for tridiagonal precision matrix
+  ############################################################
+  Sigma.s.inv   = diag(1 / sigma.st[as.vector(aux$s)])
+  D.inv         = Sigma.s.inv + (1 / aux$sigma.v2) * priors$HH
+  b             = as.matrix(Ytilde.alpha / sigma.st[as.vector(aux$s)] + (aux$h0/aux$sigma.v2)*diag(T)[,1])
+  lead.diag     = diag(D.inv)
+  sub.diag      = mgcv::sdiag(D.inv, -1)
+  D.chol        = mgcv::trichol(ld = lead.diag, sd = sub.diag)
+  D.L           = diag(D.chol$ld)
+  mgcv::sdiag(D.L,-1) = D.chol$sd
+  x             = as.matrix(rnorm(T))
+  a             = forwardsolve(D.L, b)
+  draw          = backsolve(t(D.L), a + x)
+  aux$H         = as.matrix(draw)
+  aux$sigma2    = as.vector(exp(draw))
+
+  return(aux)
+}
+```
+
+
+```{r  ext3 sampling, echo=TRUE}
+#| code-fold: true
+#| code-summary: "Gibbs Sampler for Extension 3"
+
+ext3.sampling = function(parameters, struct, priors, usedata){
+  set.seed(12345)
+  T = ncol((usedata$Y))
+  # Step 0: initialize B_0 and B_+
+  B0Vlist.initial     = ltexclusion(usedata)
+  
+  Omega.inv           = solve(priors$Omega)
+  Omega.post.inv = usedata$X%*%t(usedata$X) + Omega.inv
+  Omega.post     = solve(Omega.post.inv)
+  B.post         = (usedata$Y%*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
+  nu.post        = ncol(usedata$Y) + priors$nu
+  
+  for (i in 1:(parameters$S + parameters$S.burnin)){
+  
+  # Set in-loop definition of B0.post and Bp.post
+  if (i == 1){
+    B0.post = B0Vlist.initial$B0
+    Bp.post = cbind(array(0,c(N,1)), array(diag(N),c(usedata$N, usedata$N * usedata$p))) 
+  } else {
+    B0.post = struct$B0.posterior[,,i-1]
+    Bp.post = struct$Bp.posterior[,,i-1]
+  }
+  
+  # Step 1a: Now, update kappa0 and kappa_+ posteriors
+  kappa0.nu.post = priors$kappa0.nu + (usedata$N/2)
+  kappap.lambda.post = -(-priors$kappap.nu + usedata$K * usedata$N)/2
+  kappap.psi.post = 1/priors$kappap.s
+  kappa0.s.post = priors$kappa0.s
+  for (n in 1:usedata$N){
+    kappa0.s.post = kappa0.s.post + sum(B0.post^2)
+    kappap.chi.post = (Bp.post - B0.post %*% B.post) %*% t(Bp.post - B0.post %*% B.post)
+  }
+  
+  # Step 1b: draw kappa0 from IG2 and kappa_+ from GIG distributions
+  struct$kappa0[i] = kappa0.s.post / rchisq(n=1,df = kappa0.nu.post)
+  struct$kappap[i] = GIGrvg::rgig(n=1, kappap.lambda.post, kappap.chi.post, kappap.psi.post)
+  
+  #Step 2a: initialise inputs aux and prior
+  aux = SVaux(usedata$Y, usedata$X, B0.post, Bp.post, T)
+  SVprior = SVpriors(T)
+  
+  # Step 2b: draw the common heteroskedastic sigma2
+  aux = SVcommonSF.Gibbs.iteration(aux,SVprior)
+  sigma2 = aux$sigma2
+  
+  # Step 3a: compute posterior parameters for B0, B_+
+  Omega.inv      = solve(struct$kappap[i] * priors$Omega)
+  Omega.post.inv = usedata$X%*% diag(sigma2) %*%t(usedata$X) + Omega.inv
+  Omega.post     = solve(Omega.post.inv)
+  B.post         = (usedata$Y%*%diag(sigma2) %*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
+  S.inv.post     = usedata$Y%*%diag(sigma2) %*%t(usedata$Y) + solve(struct$kappa0[i] * priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post)
+  
+  # Step 3b: draw non-normalised B0 and B_+
+
+  B0.i = rgn(n=1, S.inv = S.inv.post, nu = nu.post, V = B0Vlist.initial$V, B0.initial = B0.post)
+  Bp.i = rnorm.ngn(B0.i, B.post, Omega.post)
+  
+  struct$B0.posterior[,,i] = B0.i
+  struct$Bp.posterior[,,i] = Bp.i
+  }
+
+  # Discard the burn-in results
+  struct$kappa0 = struct$kappa0[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$kappap = struct$kappap[(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  
+  struct$B0.posterior = struct$B0.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  struct$Bp.posterior = struct$Bp.posterior[,,(parameters$S.burnin+1):(parameters$S.burnin + parameters$S)]
+  
+  # Set normalising matrix
+  B0.last_draw = struct$B0.posterior[,,parameters$S]
+  B0_hat = diag(sign(diag(B0.last_draw))) %*% B0.last_draw
+  
+  # Compute normalised B0
+  B0.norm = normalize.Gibbs.output.parallel(struct$B0.posterior, B0_hat)
+  
+  # Compute normalised BP
+  for (i in 1:parameters$S){
+    struct$Bp.posterior[,,i] = B0.norm[,,i] %*% solve(struct$B0.posterior[,,i]) %*% struct$Bp.posterior[,,i]
+  }
+  
+  # Save normalised B0
+  struct$B0.posterior = B0.norm
+  return(struct)
+  
+}
+
+```
+
+### Data Results
+
+***Step 1:*** The following code computes the prior, initialises matrices to store results, and samples the draws for the actual data.
+```{r  ext3 Running extension for actual data, eval = FALSE, include=TRUE}
+#| code-fold: true
+#| code-summary: "View code"
+ext3.prior = ext.priors(parameters, mydata)
+ext3.struct = init.struct(mydata, parameters$S + parameters$S.burnin)
+ext3.struct <- ext3.sampling(parameters, ext3.struct, ext3.prior, mydata)
+```
+
+```{r  ext3 save struct for extension model, eval=FALSE}
+save(ext3.struct, file = "ext3.struct.RData")
+```
+
+```{r  ext3 load struct for extension model, eval=TRUE}
+load(file = "ext3.struct.RData")
+```
+
+
+
+***Step 2:*** The following code computes and stores the posterior means of $\{\kappa_0^{(s)}, \kappa_+^{(s)}, B_0^{(s)}, B_+^{(s)}\}_{s =1}^{S}$.
+```{r  ext3 compute the struct posterior means for the data, echo=TRUE}
+ext3.struct.means = structPosteriorMeans(ext3.struct)
+```
+
+***Step 3:*** The code snippets below display the sample posterior means of the estimated objects using actual data.
+
+```{r  ext3 display in latex mode the posterior means matrices, results='asis', echo=TRUE}
+ext3.data_B0 = pmatrix(ext3.struct.means$B0)
+
+```
+
+```{r ext3 display the extension model posterior mean of B_0, results='asis', echo=TRUE}
+ext3.data_Bp = pmatrix(ext3.struct.means$Bp)
+```
+
+```{r ext3 display the extension model posterior mean of kappa_0, results='asis', echo=TRUE}
+ext3.data_kappa0 = pmatrix(ext3.struct.means$kappa0)
+```
+
+```{r ext3 display the extension model posterior mean of kappa_+, results='asis', echo=TRUE}
+ext3.data_kappap = pmatrix(ext3.struct.means$kappap)
+```
+
+```{r ext3 histogram of kappa draws}
+par(mfrow=c(1,2))
+hist(ext3.struct$kappa0,
+     breaks = 100,
+     col = "deepskyblue2",
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa[0], " draws")),
+     xlab = ""
+     )
+hist(ext3.struct$kappap,
+     breaks = 100,
+     col = 'deepskyblue2',
+     border = 'black',
+     main = expression(paste("Distribution of ", kappa["+"], " draws")),
+     xlab = ""
+     )
+```
+
+
+## Analysis of priors
 
 # Empirical Investigation
 In this section, I explore how the variables in my data respond to a domestic monetary policy shock (i.e. a 25 basis points cash rate shock) and a foreign monetary policy shock (i.e. a 25 basis points US Federal Funds Rate shock) using Impulse Response Function (IRF) graphs. I also plot the Forecast Error Variance Decomposition (FEVD) plots to illustrate what extent of the variability of my variables are explained by the structural shocks the model, and how these explainability evolves over time.
@@ -1228,7 +1843,7 @@ hpi.fevd = plot_fevd(position, data.irf_fevd, parameters)
 ```
 The FEVD graph above shows that both domestic and foreign monetary policy shock have little explanatory power over the variation in house price index at time $t$ but that this power increases over time. This also indicates that the effects of these shocks have a long lasting effect and increasing effect on house prices.
 
-## Extended Model
+## Extension 1: Normal-Gamma Hyperparameter Prior
 ```{r compute the irf and fevd results for data in extended model, eval=FALSE}
 ext.data.irf_fevd = irf_fevd(parameters, mydata, ext.struct)
 ```
@@ -1241,9 +1856,9 @@ save(ext.data.irf_fevd, file = "ext.data.irf_fevd.RData")
 load("ext.data.irf_fevd.RData")
 ```
 
-### Impulse response functions
+### Impulse Response Functions
 For the extended model, using the `plot_irf` function, we plot the IRFs to a +25 basis points increase in the Australian Cash Rate.
-```{r irf of cashrate, extended model}
+```{r irf of cashrate extended model}
 #| label: ext.cashrate.irf
 #| fig-cap: "IRF plots for the AU Cash Rate Shock, Extended Model"
 #| fig-cap-location: top
@@ -1257,7 +1872,7 @@ House price index results are also qualitatively the same as under the baseline 
 
 
 For the extended model, using the `plot_irf` function, we plot the IRFs to a +25 basis points increase in the US Federal Funds Rate.
-```{r irf of usffr, extended model}
+```{r irf of usffr extended model}
 #| label: ext.usffr.irf
 #| fig-cap: "IRF plots for the US Federal Funds Rate Shock, Extended Model"
 #| fig-cap-location: top
@@ -1274,7 +1889,7 @@ The effect on house price index is similar as under the baseline specification w
 
 In the figures below, we plot the FEVDs for our selected housing variables of interest.
 
-```{r fevd for homeloan rates, extended model, warning=FALSE}
+```{r fevd for homeloan rates extended model, warning=FALSE}
 variable.choice = "Owner-occupied home loan rates"
 position = which(colnames(df) == variable.choice)
 ext.hlr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
@@ -1282,7 +1897,7 @@ ext.hlr.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
 
 The FEVD graph above shows that the domestic monetary policy shock carries the bulk of the explanatory power in the variability of home loan rates. Compared to the baseline model, the shocks on real economy variables (GDP, consumption) are even less important (and carry virtually no explanatory power) while the change in CPI also become less important.
 
-```{r fevd for quantity of new homes, extended model}
+```{r fevd for quantity of new homes extended model}
 variable.choice = "Quantity of new homes (log)"
 position = which(colnames(df) == variable.choice)
 ext.nh.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
@@ -1290,13 +1905,71 @@ ext.nh.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
 
 The FEVD graph above shows that while both domestic and foreign monetary policy have little explanatory power on the variability of the quantity of new homes built, the power increases over time. However, this increase in explanatory power is lower than in the baseline model. Moreover, shocks on the real economic indicators (GDP, consumption) are relatively more important while change in inflation is less important in explaining the variability of the quantity of new homes.
 
-```{r fevd for house price index, extended model}
+```{r fevd for house price index extended model}
 variable.choice = "House Price Index (log)"
 position = which(colnames(df) == variable.choice)
 ext.hpi.fevd = plot_fevd(position, ext.data.irf_fevd, parameters)
 ```
 
 Under the extended model specification, the domestic monetary policy shock appears less important, whereas the home loan rate shock becomes much more important in explaining the variability in house price index. 
+
+## Extension 2: Inverse Normal Gamma 2 Prior
+```{r compute the irf and fevd results for data in extended model 2, eval=FALSE}
+ext2.data.irf_fevd = irf_fevd(parameters, mydata, ext2.struct)
+```
+
+```{r save the irf and fevd results for data in extended model 2, eval=FALSE}
+save(ext2.data.irf_fevd, file = "ext2.data.irf_fevd.RData")
+```
+
+```{r load the irf and fevd results for data in extended model 2, eval=TRUE}
+load("ext2.data.irf_fevd.RData")
+```
+
+### Impulse Response Functions
+```{r irf of cashrate extended model 2}
+#| label: ext.cashrate.irf 2
+#| fig-cap: "IRF plots for the AU Cash Rate Shock, Extended Model"
+#| fig-cap-location: top
+ext2.cashrate.irf = plot_irf(5, ext2.data.irf_fevd, parameters)
+```
+The IRF results are different compared to the baseline results. The effect of a positive domestic monetary policy shock on home loan rates seems to be more persistent as the effect erodes away at a much lower rate.
+
+The quantity of new homes built is the qualitatively the same as under the baseline specification, except for the absence of an initial boost in the number of houses built. Quantitatively, the negative effect on quantity of new homes is much lower under this specification.
+
+House price index results are also qualitatively the same as under the baseline specification. However, the magnitude of the reduction in house prices due to a positive monetary policy shock is also lower than under the baseline specification.
+
+
+For the extended model, using the `plot_irf` function, we plot the IRFs to a +25 basis points increase in the US Federal Funds Rate.
+```{r irf of usffr extended model 2}
+#| label: ext.usffr.irf 2
+#| fig-cap: "IRF plots for the US Federal Funds Rate Shock, Extended Model"
+#| fig-cap-location: top
+ext2.usffr.irf = plot_irf(1, ext2.data.irf_fevd, parameters)
+```
+
+### Forecast Error Variance Decomposition
+```{r fevd for homeloan rates extended model 2, warning=FALSE}
+variable.choice = "Owner-occupied home loan rates"
+position = which(colnames(df) == variable.choice)
+ext2.hlr.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+The FEVD graph above shows that the domestic monetary policy shock carries the bulk of the explanatory power in the variability of home loan rates. Compared to the baseline model, the shocks on real economy variables (GDP, consumption) are even less important (and carry virtually no explanatory power) while the change in CPI also become less important.
+
+```{r fevd for quantity of new homes extended model 2}
+variable.choice = "Quantity of new homes (log)"
+position = which(colnames(df) == variable.choice)
+ext2.nh.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+The FEVD graph above shows that while both domestic and foreign monetary policy have little explanatory power on the variability of the quantity of new homes built, the power increases over time. However, this increase in explanatory power is lower than in the baseline model. Moreover, shocks on the real economic indicators (GDP, consumption) are relatively more important while change in inflation is less important in explaining the variability of the quantity of new homes.
+
+```{r fevd for house price index extended model 2}
+variable.choice = "House Price Index (log)"
+position = which(colnames(df) == variable.choice)
+ext2.hpi.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
 
 # Appendix {#appendix}
 ```{r, file="L16 codes.R"}
@@ -1405,6 +2078,56 @@ fevd.plots = c("ext.usffr.fevd", "ext.gdp.fevd", "ext.con.fevd", "ext.cpi.fevd",
 
 ```
 
+### Extension 2
+```{r fevd for nominal gdp extended model 2}
+variable.choice = "Nominal GDP (log)"
+position = which(colnames(df) == variable.choice)
+ext2.gdp.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+```{r fevd for consumption extended model 2}
+variable.choice = "Aggregate Consumption (log)"
+position = which(colnames(df) == variable.choice)
+ext2.con.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+```{r fevd for change in cpi extended model 2}
+variable.choice = "% Change in CPI, yoy"
+position = which(colnames(df) == variable.choice)
+ext2.cpi.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+```{r fevd for usffr extended model 2}
+variable.choice = "US FFR Max Target Rate"
+position = which(colnames(df) == variable.choice)
+ext2.usffr.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+
+```{r fevd for cashrate extended model 2, warning=FALSE}
+variable.choice = "RBA Target Cash Rate"
+position = which(colnames(df) == variable.choice)
+ext2.aucr.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+
+```{r fevd for m1 extended model 2}
+variable.choice = "M1 Money Supply (logs)"
+position = which(colnames(df) == variable.choice)
+ext2.m1.fevd = plot_fevd(position, ext2.data.irf_fevd, parameters)
+```
+
+```{r save fevd figures in a single plot for extended model 2, eval=FALSE}
+fevd2.plots = c("ext2.usffr.fevd", "ext2.gdp.fevd", "ext2.con.fevd", "ext2.cpi.fevd", "ext2.aucr.fevd", "ext2.m1.fevd", "ext2.hlr.fevd", "ext2.nh.fevd", "ext2.hpi.fevd")
+  # Save each plot as an EPS file
+  for (i in 1:length(fevd2.plots)) {
+    filename <- paste0(fevd2.plots[i], ".pdf")
+    pdf(file = filename, onefile = FALSE, height=9, width = 16)
+    plot_fevd(i, ext2.data.irf_fevd, parameters)
+    dev.off()
+  }
+
+```
 # References {.unnumbered}
 
 
