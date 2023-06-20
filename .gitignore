@@ -13,6 +13,7 @@
 data.irf_fevd.RData
 ext.data.irf_fevd.RData
 ext2.data.irf_fevd.RData
+ext3.data.irf_fevd.RData
 ext2.sim.struct.RData
 ext.struct.RData
 ext2.struct.RData
