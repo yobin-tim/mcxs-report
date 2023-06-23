@@ -1446,9 +1446,9 @@ $$
 where $\sigma^2 = (\exp(h_1), \dots, \exp(h_T))$ is the $T-$vector. This introduction of stochastic volatility transforms the posterior parameters of $(B_+,B_0)$ as follows:
 $$
 \begin{align*}
-&\bar \Omega = (X diag(\sigma^2) X' + \underline \Omega^{-1})^{-1}\\
-&\bar B = (Ydiag(\sigma^2)X' + \underline B \underline \Omega^{-1}) \bar \Omega\\
-&\bar S = (Ydiag(\sigma^2)Y' + \underline S^{-1} + \underline B \underline \Omega^{-1} \underline B' - \bar B \bar \Omega^{-1} \bar B')^{-1}
+&\bar \Omega = (X diag(\sigma^2)^{-1} X' + \underline \Omega^{-1})^{-1}\\
+&\bar B = (Ydiag(\sigma^2)^{-1}X' + \underline B \underline \Omega^{-1}) \bar \Omega\\
+&\bar S = (Ydiag(\sigma^2)^{-1}Y' + \underline S^{-1} + \underline B \underline \Omega^{-1} \underline B' - \bar B \bar \Omega^{-1} \bar B')^{-1}
 \end{align*}
 $$
 while $\bar \nu = T + \underline \nu$ updates the same way as before.
@@ -1620,10 +1620,10 @@ ext3.sampling = function(parameters, struct, priors, usedata){
   
   # Step 3a: compute posterior parameters for B0, B_+
   Omega.inv      = solve(struct$kappap[i] * priors$Omega)
-  Omega.post.inv = usedata$X%*% diag(sigma2) %*%t(usedata$X) + Omega.inv
+  Omega.post.inv = usedata$X%*% diag(1/sigma2) %*%t(usedata$X) + Omega.inv
   Omega.post     = solve(Omega.post.inv)
-  B.post         = (usedata$Y%*%diag(sigma2) %*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
-  S.inv.post     = usedata$Y%*%diag(sigma2) %*%t(usedata$Y) + solve(struct$kappa0[i] * priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post)
+  B.post         = (usedata$Y%*%diag(1/sigma2) %*%t(usedata$X) + priors$B%*%Omega.inv) %*% Omega.post
+  S.inv.post     = usedata$Y%*%diag(1/sigma2) %*%t(usedata$Y) + solve(struct$kappa0[i] * priors$S) + priors$B%*%Omega.inv%*%t(priors$B) - B.post%*%Omega.post.inv%*%t(B.post)
   
   # Step 3b: draw non-normalised B0 and B_+
 
